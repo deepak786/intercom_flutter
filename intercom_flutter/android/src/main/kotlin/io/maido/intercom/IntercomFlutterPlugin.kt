@@ -108,7 +108,7 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
           result.success("Launched")
         }
         "hideMessenger" -> {
-          Intercom.client().hideIntercom()
+          Intercom.client().hideMessenger()
           result.success("Hidden")
         }
         "displayHelpCenter" -> {
