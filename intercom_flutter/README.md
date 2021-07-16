@@ -3,7 +3,8 @@
 [![Pub](https://img.shields.io/pub/v/intercom_flutter.svg)](https://pub.dev/packages/intercom_flutter)
 ![CI](https://github.com/v3rm0n/intercom_flutter/workflows/CI/badge.svg)
 
-Flutter wrapper for Intercom [Android](https://github.com/intercom/intercom-android) and [iOS](https://github.com/intercom/intercom-ios) projects.
+Flutter wrapper for Intercom [Android](https://github.com/intercom/intercom-android) and [iOS](https://github.com/intercom/intercom-ios) projects. <br/>
+Now it also supports [Web](https://developers.intercom.com/installing-intercom/docs/basic-javascript).
 
 ## Usage
 
@@ -110,3 +111,23 @@ Future<dynamic> backgroundMessageHandler(Map<String, dynamic> message) async {
 
 ### iOS
 Make sure that you have a `NSPhotoLibraryUsageDescription` entry in your `Info.plist`.
+
+### Web
+Add the below script inside body tag in the index.html file located under web folder
+```html
+<script>
+    window.intercomSettings = {
+        hide_default_launcher: true, // set this to false, if you want to show the default launcher
+    };
+    (function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',w.intercomSettings);}else{var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.Intercom=i;var l=function(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s, x);};if(document.readyState==='complete'){l();}else if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})();
+</script>
+```
+#### Following functions are not yet supported on Web:
+
+- [ ] unreadConversationCount
+- [ ] setInAppMessagesVisibility
+- [ ] displayHelpCenter
+- [ ] sendTokenToIntercom
+- [ ] handlePushMessage
+- [ ] isIntercomPush
+- [ ] handlePush

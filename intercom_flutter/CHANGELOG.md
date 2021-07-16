@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.0.0
+* Added web support
+* Bump Intercom iOS SDK version to 10.0.2
+    - this will solve the displayArticle issue. See https://github.com/intercom/intercom-ios/blob/master/CHANGELOG.md#1002
+
 ## 4.0.0
 * Bump Intercom Android SDK version to 10.0.0
 * Bump Intercom iOS SDK version to 10.0.0
