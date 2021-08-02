@@ -1,5 +1,8 @@
 # Changelog
 
+## 5.0.1
+* clear warning `PushInterceptService.java uses unchecked or unsafe operations.`
+
 ## 5.0.0
 * Added web support
 * Bump Intercom iOS SDK version to 10.0.2
