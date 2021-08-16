@@ -3,7 +3,7 @@
 [![Pub](https://img.shields.io/pub/v/intercom_flutter.svg)](https://pub.dev/packages/intercom_flutter)
 ![CI](https://github.com/v3rm0n/intercom_flutter/workflows/CI/badge.svg)
 
-Flutter wrapper for Intercom [Android](https://github.com/intercom/intercom-android) and [iOS](https://github.com/intercom/intercom-ios) projects. <br/>
+Flutter wrapper for Intercom [Android](https://github.com/intercom/intercom-android) and [iOS](https://github.com/intercom/intercom-ios) projects.  
 Now it also supports [Web](https://developers.intercom.com/installing-intercom/docs/basic-javascript).
 
 ## Usage
