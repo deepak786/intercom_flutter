@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.0.2
+* updated README: Removed the `<br/>` tag that was being shown on the pub.dev.
+* updated intercom_flutter pod version to `5.0.0`.
+
 ## 5.0.1
 * clear warning `PushInterceptService.java uses unchecked or unsafe operations.`
 
