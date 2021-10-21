@@ -41,7 +41,7 @@ class IntercomFlutterWeb extends IntercomFlutterPlatform {
     String? iosApiKey,
   }) async {
     await js.context.callMethod('Intercom', [
-      'update',
+      'boot',
       convertJsObjectToDartObject(updateIntercomSettings('app_id', appId)),
     ]);
     print("initialized");

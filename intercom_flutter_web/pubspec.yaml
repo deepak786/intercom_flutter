@@ -1,6 +1,6 @@
 name: intercom_flutter_web
 description: Web platform implementation of intercom_flutter
-version: 0.0.2
+version: 0.0.3
 homepage: https://github.com/v3rm0n/intercom_flutter
 
 flutter:

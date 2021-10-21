@@ -1,5 +1,8 @@
 # Changelog
 
+## 5.0.3
+* resolved issue [#173](https://github.com/v3rm0n/intercom_flutter/issues/173)
+
 ## 5.0.2
 * updated README: Removed the `<br/>` tag that was being shown on the pub.dev.
 * updated intercom_flutter pod version to `5.0.0`.

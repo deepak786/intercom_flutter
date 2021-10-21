@@ -11,6 +11,14 @@ dependencies:
   intercom_flutter:
     path: ../
 
+dependency_overrides:
+  intercom_flutter:
+    path: ../
+  intercom_flutter_platform_interface:
+    path: ../../intercom_flutter_platform_interface
+  intercom_flutter_web:
+    path: ../../intercom_flutter_web
+
 flutter:
   uses-material-design: true
 
