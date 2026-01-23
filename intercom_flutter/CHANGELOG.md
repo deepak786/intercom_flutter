@@ -1,5 +1,9 @@
 # Changelog
 
+## 9.4.24
+
+* Updated README
+
 ## 9.4.23
 
 * Bump Intercom Android SDK version to [17.4.1](https://github.com/intercom/intercom-android/releases/tag/17.4.1)
