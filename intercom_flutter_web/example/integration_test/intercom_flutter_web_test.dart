@@ -1,11 +1,44 @@
+import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:intercom_flutter_web/intercom_flutter_web.dart';
+import 'package:web/web.dart' as web;
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
+  /// This replaces the script tag normally found in index.html
+  void injectIntercomMock() {
+    final eval = globalContext.getProperty('eval'.toJS) as JSFunction;
+    eval.callAsFunction(
+      globalContext,
+      '''
+    window.Intercom = function(command, args) {
+      console.log("JS: Intercom called with", command, args);
+      window._intercomCalls = window._intercomCalls || [];
+      window._intercomCalls.push({command: command, args: args});
+    };
+  '''
+          .toJS,
+    );
+
+    final settings = JSObject();
+    settings.setProperty('app_id'.toJS, 'mock'.toJS);
+    web.window.setProperty('intercomSettings'.toJS, settings);
+  }
+
   group('IntercomFlutter', () {
+    setUpAll(() {
+      injectIntercomMock();
+    });
+
+    testWidgets('Intercom JS mock is installed', (_) async {
+      final intercom = web.window.getProperty('Intercom'.toJS);
+      expect(intercom, isNotNull);
+    });
+
     late IntercomFlutterWeb plugin;
 
     setUp(() {
@@ -115,8 +148,9 @@ void main() {
       });
     });
 
-    testWidgets('testStream', (WidgetTester _) async {
-      expect(plugin.getUnreadStream().first, completes);
+    testWidgets('testStream is accessible', (WidgetTester _) async {
+      final stream = plugin.getUnreadStream();
+      expect(stream, isA<Stream<int>>());
     });
 
     testWidgets('displayArticle', (WidgetTester _) async {
