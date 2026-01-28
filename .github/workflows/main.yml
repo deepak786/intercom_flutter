@@ -90,7 +90,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: nanasess/setup-chromedriver@v2      
     - uses: subosito/flutter-action@v1
       with:
         channel: 'stable'
@@ -110,26 +109,19 @@ jobs:
       run: flutter analyze
       working-directory: ${{env.source-directory}}
 
-    # Run chrome driver
-    - name: Run chrome driver
-      run: chromedriver --port=4444 &
-      working-directory: ${{env.source-directory}}
-
-    # Run all integration tests
+    # Run all integration tests (-d chrome with headless so driver gets VM_SERVICE_URL; web-server times out because driver never gets URL)
     - name: Run integration tests
       timeout-minutes: 10
       run: |
         sudo apt-get update
         sudo apt-get install -y --no-install-recommends xvfb
 
-        export CHROME_FLAGS="--no-sandbox --disable-dev-shm-usage"
+        export CHROME_FLAGS="--headless --no-sandbox --disable-dev-shm-usage --disable-gpu --window-size=1920,1080"
 
         xvfb-run -a -s "-screen 0 1920x1080x24" \
           flutter drive \
             --target=integration_test/intercom_flutter_web_test.dart \
             --driver=test_driver/integration_test.dart \
             -d chrome \
-            --wasm \
-            --dart-define=CI=true \
-            | tee output.log
+            --dart-define=CI=true
       working-directory: ${{env.source-directory}}
