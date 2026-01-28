@@ -90,6 +90,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: nanasess/setup-chromedriver@v2
     - uses: subosito/flutter-action@v1
       with:
         channel: 'stable'
@@ -109,7 +110,12 @@ jobs:
       run: flutter analyze
       working-directory: ${{env.source-directory}}
 
-    # Run all integration tests (-d chrome with headless so driver gets VM_SERVICE_URL; web-server times out because driver never gets URL)
+    # Run chromedriver (required for flutter drive -d chrome on web)
+    - name: Run chromedriver
+      run: chromedriver --port=4444 &
+      working-directory: ${{env.source-directory}}
+
+    # Run all integration tests (-d chrome with headless so driver gets VM_SERVICE_URL)
     - name: Run integration tests
       timeout-minutes: 10
       run: |
