@@ -118,5 +118,24 @@ jobs:
     # Run all integration tests
     - name: Run integration tests
       timeout-minutes: 10
-      run: flutter drive --target=integration_test/intercom_flutter_web_test.dart --driver=test_driver/integration_test.dart -d chrome --wasm --dart-define=CI=true | tee output.log
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends xvfb
+
+        export DISPLAY=:99
+
+        # Start virtual X server
+        Xvfb :99 -screen 0 1920x1080x24 > /tmp/xvfb.log 2>&1 &
+        sleep 3
+
+        # Sanity check (optional but useful)
+        xdpyinfo >/dev/null 2>&1 || (echo "Xvfb failed to start" && exit 1)
+
+        flutter drive \
+          --target=integration_test/intercom_flutter_web_test.dart \
+          --driver=test_driver/integration_test.dart \
+          -d chrome \
+          --wasm \
+          --dart-define=CI=true \
+          | tee output.log
       working-directory: ${{env.source-directory}}
