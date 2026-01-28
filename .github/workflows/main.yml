@@ -118,5 +118,5 @@ jobs:
     # Run all integration tests
     - name: Run integration tests
       timeout-minutes: 10
-      run: flutter drive -d web-server --browser-name=chrome --driver=test_driver/integration_test.dart --target=integration_test/intercom_flutter_web_test.dart
+      run: flutter drive --target=integration_test/intercom_flutter_web_test.dart --driver=test_driver/integration_test.dart -d chrome --wasm --dart-define=CI=true | tee output.log
       working-directory: ${{env.source-directory}}
