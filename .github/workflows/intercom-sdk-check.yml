@@ -1,0 +1,39 @@
+name: Check Intercom SDK Updates
+
+on:
+  schedule:
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Run SDK update script
+        id: sdk
+        run: dart scripts/check_intercom_sdk_updates.dart
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: 'Update Intercom SDK versions to ${{ steps.sdk.outputs.android_version }} for Android and ${{ steps.sdk.outputs.ios_version }} for iOS'
+          title: 'Update Intercom SDK versions to ${{ steps.sdk.outputs.android_version }} for Android and ${{ steps.sdk.outputs.ios_version }} for iOS'
+          body: |
+            Automated Intercom SDK update.
+
+            - Updates Android and iOS Intercom SDK versions where applicable.
+            - Refreshes README and CHANGELOG entries.
+          branch: automation/intercom-sdk-update
+          labels: automation
