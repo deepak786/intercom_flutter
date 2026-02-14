@@ -17,6 +17,7 @@ Flutter wrapper for Intercom [Android](https://github.com/intercom/intercom-andr
 Import `package:intercom_flutter/intercom_flutter.dart` and use the methods in `Intercom` class.
 
 Example:
+
 ```dart
 import 'package:flutter/material.dart';
 import 'package:intercom_flutter/intercom_flutter.dart';
@@ -50,6 +51,53 @@ class App extends StatelessWidget {
 
 See Intercom [Android](https://developers.intercom.com/installing-intercom/docs/intercom-for-android) and [iOS](https://developers.intercom.com/installing-intercom/docs/intercom-for-ios) package documentation for more information.
 
+### Listening for Intercom Window Events
+
+You can listen for when the Intercom window is hidden (closed) using the `getWindowDidHideStream()` method. This is particularly useful for performing actions when users close the Intercom messenger, help center, or other Intercom windows.
+
+**Note:** This feature is only available on iOS.
+
+````dart
+import 'package:flutter/material.dart';
+import 'package:intercom_flutter/intercom_flutter.dart';
+import 'dart:async';
+
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  StreamSubscription? _windowDidHideSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    // Listen for when the Intercom window is hidden
+    _windowDidHideSubscription = Intercom.instance.getWindowDidHideStream().listen((_) {
+      // This will be called when the Intercom window is closed
+      print('Intercom window was closed!');
+      // Perform any actions you need when the window is closed
+    });
+  }
+
+  @override
+  void dispose() {
+    _windowDidHideSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      child: Text('Open Intercom'),
+      onPressed: () async {
+        await Intercom.instance.displayMessenger();
+      },
+    );
+  }
+}
+
 ### Android
 
 Make sure that your app's `MainActivity` extends `FlutterFragmentActivity` (you can check the example).
@@ -57,7 +105,7 @@ Make sure that your app's `MainActivity` extends `FlutterFragmentActivity` (you 
 Permissions:
 ```xml
 <uses-permission android:name="android.permission.INTERNET"/>
-```
+````
 
 Optional permissions:
 
@@ -75,25 +123,32 @@ android.enableJetifier=true
 ```
 
 According to the documentation, Intercom must be initialized in the Application onCreate. So follow the below steps to achieve the same:
+
 - Setup custom application class if you don't have any.
-    - Create a custom `android.app.Application` class named `MyApp`.
-    - Add an `onCreate()` override. The class should look like this:
-    ```kotlin
-    import android.app.Application
 
-    class MyApp: Application() {
+  - Create a custom `android.app.Application` class named `MyApp`.
+  - Add an `onCreate()` override. The class should look like this:
 
-        override fun onCreate() {
-            super.onCreate()
-        }
-    }
-    ```
-    - Open your `AndroidManifest.xml` and find the `application` tag. In it, add an `android:name` attribute, and set the value to your class' name, prefixed by a dot (.).
-    ```xml
-    <application
-      android:name=".MyApp" >
-    ```
+  ```kotlin
+  import android.app.Application
+
+  class MyApp: Application() {
+
+      override fun onCreate() {
+          super.onCreate()
+      }
+  }
+  ```
+
+  - Open your `AndroidManifest.xml` and find the `application` tag. In it, add an `android:name` attribute, and set the value to your class' name, prefixed by a dot (.).
+
+  ```xml
+  <application
+    android:name=".MyApp" >
+  ```
+
 - Now initialize the Intercom SDK inside the `onCreate()` of custom application class according to the following:
+
 ```kotlin
 import android.app.Application
 import io.maido.intercom.IntercomFlutterPlugin
@@ -109,16 +164,18 @@ class MyApp : Application() {
 ```
 
 ### iOS
+
 Make sure that you have a `NSPhotoLibraryUsageDescription` entry in your `Info.plist`.
 
 ### Push notifications setup
+
 This plugin works in combination with the [`firebase_messaging`](https://pub.dev/packages/firebase_messaging) plugin to receive Push Notifications. To set this up:
 
-* First, implement [`firebase_messaging`](https://pub.dev/packages/firebase_messaging)
-* Then, add the Firebase server key to Intercom, as described [here](https://developers.intercom.com/installing-intercom/docs/android-fcm-push-notifications#section-step-3-add-your-server-key-to-intercom-for-android-settings) (you can skip 1 and 2 as you have probably done them while configuring `firebase_messaging`)
-* Follow the steps as described [here](https://developers.intercom.com/installing-intercom/docs/ios-push-notifications) to enable push notification in iOS.
-* Starting from Android 13 you may need to ask for notification permissions (as of version 13 `firebase_messaging` should support that)
-* Ask FirebaseMessaging for the token that we need to send to Intercom, and give it to Intercom (so Intercom can send push messages to the correct device), please note that in order to receive push notifications in your iOS app, you have to send the APNS token to Intercom. The example below uses [`firebase_messaging`](https://pub.dev/packages/firebase_messaging) to get either the FCM or APNS token based on the platform:
+- First, implement [`firebase_messaging`](https://pub.dev/packages/firebase_messaging)
+- Then, add the Firebase server key to Intercom, as described [here](https://developers.intercom.com/installing-intercom/docs/android-fcm-push-notifications#section-step-3-add-your-server-key-to-intercom-for-android-settings) (you can skip 1 and 2 as you have probably done them while configuring `firebase_messaging`)
+- Follow the steps as described [here](https://developers.intercom.com/installing-intercom/docs/ios-push-notifications) to enable push notification in iOS.
+- Starting from Android 13 you may need to ask for notification permissions (as of version 13 `firebase_messaging` should support that)
+- Ask FirebaseMessaging for the token that we need to send to Intercom, and give it to Intercom (so Intercom can send push messages to the correct device), please note that in order to receive push notifications in your iOS app, you have to send the APNS token to Intercom. The example below uses [`firebase_messaging`](https://pub.dev/packages/firebase_messaging) to get either the FCM or APNS token based on the platform:
 
 ```dart
 final firebaseMessaging = FirebaseMessaging.instance;
@@ -130,15 +187,18 @@ Intercom.instance.sendTokenToIntercom(intercomToken);
 Now, if either Firebase direct (e.g. by your own backend server) or Intercom sends you a message, it will be delivered to your app.
 
 ### Web
+
 You don't need to do any extra steps for the web. Intercom script will be automatically injected.
 But you can pre-define some Intercom settings, if you want (optional).
+
 ```html
 <script>
-    window.intercomSettings = {
-        hide_default_launcher: true, // hide the default launcher
-    };
+  window.intercomSettings = {
+    hide_default_launcher: true, // hide the default launcher
+  };
 </script>
 ```
+
 #### Following functions are not yet supported on Web:
 
 - [ ] unreadConversationCount
@@ -149,18 +209,22 @@ But you can pre-define some Intercom settings, if you want (optional).
 - [ ] handlePush
 - [ ] displayCarousel
 - [ ] displayHelpCenterCollections
+- [ ] getWindowDidHideStream
 
 ## Using Intercom keys with `--dart-define`
 
-Use `--dart-define` variables to avoid hardcoding Intercom keys. 
+Use `--dart-define` variables to avoid hardcoding Intercom keys.
 
 ### Pass the Intercom keys with `flutter run` or `flutter build` command using `--dart-define`.
+
 ```dart
 flutter run --dart-define="INTERCOM_APP_ID=appID" --dart-define="INTERCOM_ANDROID_KEY=androidKey" --dart-define="INTERCOM_IOS_KEY=iosKey"
 ```
+
 Note: You can also use `--dart-define-from-file` which is introduced in Flutter 3.7.
 
 ### Reading keys in Dart side and initialize the SDK.
+
 ```dart
 String appId = String.fromEnvironment("INTERCOM_APP_ID", "");
 String androidKey = String.fromEnvironment("INTERCOM_ANDROID_KEY", "");
@@ -171,7 +235,8 @@ Intercom.instance.initialize(appId, iosApiKey: iOSKey, androidApiKey: androidKey
 
 ### Reading keys in Android native side and initialize the SDK.
 
-* Add the following code to `build.gradle`.
+- Add the following code to `build.gradle`.
+
 ```
 def dartEnvironmentVariables = []
 if (project.hasProperty('dart-defines')) {
@@ -184,7 +249,8 @@ if (project.hasProperty('dart-defines')) {
 }
 ```
 
-* Place `dartEnvironmentVariables` inside the build config
+- Place `dartEnvironmentVariables` inside the build config
+
 ```
 defaultConfig {
     ...
@@ -193,7 +259,8 @@ defaultConfig {
 }
 ```
 
-* Read the build config fields
+- Read the build config fields
+
 ```kotlin
 import android.app.Application
 import android.os.Build
@@ -202,10 +269,10 @@ import io.maido.intercom.IntercomFlutterPlugin
 class MyApp : Application() {
   override fun onCreate() {
     super.onCreate()
-    
+
     // Add this line with your keys
-    IntercomFlutterPlugin.initSdk(this, 
-      appId = BuildConfig.INTERCOM_APP_ID, 
+    IntercomFlutterPlugin.initSdk(this,
+      appId = BuildConfig.INTERCOM_APP_ID,
       androidApiKey = BuildConfig.INTERCOM_ANDROID_KEY)
   }
 }

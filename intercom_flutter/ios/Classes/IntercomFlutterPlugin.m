@@ -2,6 +2,7 @@
 #import <Intercom/Intercom.h>
 
 id unread;
+id windowDidHide;
 
 @implementation UnreadStreamHandler
 - (FlutterError*)onListenWithArguments:(id)arguments eventSink:(FlutterEventSink)eventSink {
@@ -18,6 +19,20 @@ id unread;
 }
 @end
 
+@implementation WindowDidHideStreamHandler
+- (FlutterError*)onListenWithArguments:(id)arguments eventSink:(FlutterEventSink)eventSink {
+    windowDidHide = [[NSNotificationCenter defaultCenter] addObserverForName:IntercomWindowDidHideNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification * _Nonnull note) {
+        eventSink(@(YES));
+    }];
+  return nil;
+}
+
+- (FlutterError*)onCancelWithArguments:(id)arguments {
+    [[NSNotificationCenter defaultCenter] removeObserver:windowDidHide];
+  return nil;
+}
+@end
+
 @implementation IntercomFlutterPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     IntercomFlutterPlugin* instance = [[IntercomFlutterPlugin alloc] init];
@@ -30,6 +45,12 @@ id unread;
     UnreadStreamHandler* unreadStreamHandler =
         [[UnreadStreamHandler alloc] init];
     [unreadChannel setStreamHandler:unreadStreamHandler];
+    
+    FlutterEventChannel* windowDidHideChannel = [FlutterEventChannel eventChannelWithName:@"maido.io/intercom/windowDidHide"
+    binaryMessenger:[registrar messenger]];
+    WindowDidHideStreamHandler* windowDidHideStreamHandler =
+        [[WindowDidHideStreamHandler alloc] init];
+    [windowDidHideChannel setStreamHandler:windowDidHideStreamHandler];
     
 }
 

@@ -33,6 +33,8 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
     channel.setMethodCallHandler(IntercomFlutterPlugin())
     val unreadEventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "maido.io/intercom/unread")
     unreadEventChannel.setStreamHandler(IntercomFlutterPlugin())
+    val windowDidHideEventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "maido.io/intercom/windowDidHide")
+    windowDidHideEventChannel.setStreamHandler(IntercomFlutterPlugin())
     application = flutterPluginBinding.applicationContext as Application
   }
 
@@ -385,14 +387,22 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
   }
 
   override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-    unreadConversationCountListener = UnreadConversationCountListener { count ->
-        val handler = android.os.Handler(android.os.Looper.getMainLooper())
-        handler.post {
-          events?.success(count)
+    // Check if this is the unread stream or windowDidHide stream
+    // For unread stream, we set up the listener
+    // For windowDidHide stream, we don't set up anything since it's iOS-specific
+    if (arguments == null || arguments.toString().contains("unread") || arguments.toString().isEmpty()) {
+      // This is the unread stream
+      unreadConversationCountListener = UnreadConversationCountListener { count ->
+          val handler = android.os.Handler(android.os.Looper.getMainLooper())
+          handler.post {
+            events?.success(count)
+          }
+        }.also {
+          Intercom.client().addUnreadConversationCountListener(it)
         }
-      }.also {
-        Intercom.client().addUnreadConversationCountListener(it)
-      }
+    }
+    // For windowDidHide stream, we don't need to do anything since it's iOS-specific
+    // The stream will not emit any events on Android
   }
 
   override fun onCancel(arguments: Any?) {

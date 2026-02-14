@@ -5,3 +5,6 @@
 
 @interface UnreadStreamHandler : NSObject <FlutterStreamHandler>
 @end
+
+@interface WindowDidHideStreamHandler : NSObject <FlutterStreamHandler>
+@end

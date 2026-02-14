@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intercom_flutter/intercom_flutter.dart';
 
@@ -13,7 +15,39 @@ void main() async {
   runApp(SampleApp());
 }
 
-class SampleApp extends StatelessWidget {
+class SampleApp extends StatefulWidget {
+  @override
+  _SampleAppState createState() => _SampleAppState();
+}
+
+class _SampleAppState extends State<SampleApp> {
+  StreamSubscription? _windowDidHideSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    // Listen for when the Intercom window is hidden
+    _windowDidHideSubscription =
+        Intercom.instance.getWindowDidHideStream().listen((_) {
+      // This will be called when the Intercom window is closed
+      // Only works on iOS
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Intercom window was closed!'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _windowDidHideSubscription?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,18 +56,29 @@ class SampleApp extends StatelessWidget {
           title: const Text('Intercom example app'),
         ),
         body: Center(
-          child: TextButton(
-            onPressed: () {
-              // NOTE:
-              // Messenger will load the messages only if the user is registered
-              // in Intercom.
-              // Either identified or unidentified.
-              // So make sure to login the user in Intercom first before opening
-              // the intercom messenger.
-              // Otherwise messenger will not load.
-              Intercom.instance.displayMessenger();
-            },
-            child: Text('Show messenger'),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                onPressed: () {
+                  // NOTE:
+                  // Messenger will load the messages only if the user is registered
+                  // in Intercom.
+                  // Either identified or unidentified.
+                  // So make sure to login the user in Intercom first before opening
+                  // the intercom messenger.
+                  // Otherwise messenger will not load.
+                  Intercom.instance.displayMessenger();
+                },
+                child: Text('Show messenger'),
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Close the Intercom window to see the notification!',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
           ),
         ),
       ),
