@@ -112,24 +112,15 @@ jobs:
       run: flutter analyze
       working-directory: ${{env.source-directory}}
 
-    - name: Install xvfb
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y --no-install-recommends xvfb
+    - name: Start chromedriver
+      run: chromedriver --port=4444 &
 
-    # chromedriver and flutter drive must share the same xvfb display
     - name: Run integration tests
       timeout-minutes: 10
       run: |
-        xvfb-run -a -s "-screen 0 1920x1080x24" bash -c '
-          chromedriver --port=4444 &
-          sleep 2
-          flutter drive \
-            --target=integration_test/intercom_flutter_web_test.dart \
-            --driver=test_driver/integration_test.dart \
-            -d chrome \
-            --web-browser-flag=--no-sandbox \
-            --web-browser-flag=--disable-gpu \
-            --web-browser-flag=--disable-dev-shm-usage
-        '
+        flutter drive \
+          -d web-server \
+          --browser-name=chrome \
+          --driver=test_driver/integration_test.dart \
+          --target=integration_test/intercom_flutter_web_test.dart
       working-directory: ${{env.source-directory}}
