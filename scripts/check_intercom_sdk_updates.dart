@@ -82,9 +82,9 @@ String _updateBuildGradle(String contents, String version) {
   return updated;
 }
 
-String _updatePodspec(String contents, String version) {
+String _updatePackageSwift(String contents, String version) {
   return contents.replaceAllMapped(
-    RegExp(r"(s\.dependency 'Intercom', ')(\d+\.\d+\.\d+)(')"),
+    RegExp(r'(exact:\s*")(\d+\.\d+\.\d+)(")'),
     (match) => '${match.group(1)}$version${match.group(3)}',
   );
 }
@@ -153,20 +153,20 @@ Future<void> main(List<String> args) async {
   }
 
   final buildGradlePath = _joinPath(repoRoot, 'intercom_flutter/android/build.gradle');
-  final podspecPath = _joinPath(repoRoot, 'intercom_flutter/ios/intercom_flutter.podspec');
+  final packageSwiftPath = _joinPath(repoRoot, 'intercom_flutter/ios/intercom_flutter/Package.swift');
   final readmePath = _joinPath(repoRoot, 'intercom_flutter/README.md');
   final changelogPath = _joinPath(repoRoot, 'intercom_flutter/CHANGELOG.md');
   final pubspecPath = _joinPath(repoRoot, 'intercom_flutter/pubspec.yaml');
 
   final buildGradle = _readFile(buildGradlePath);
-  final podspec = _readFile(podspecPath);
+  final packageSwift = _readFile(packageSwiftPath);
   final readme = _readFile(readmePath);
   final changelog = _readFile(changelogPath);
   final pubspec = _readFile(pubspecPath);
 
   final androidMatch =
       RegExp(r'io\.intercom\.android:intercom-sdk:(\d+\.\d+\.\d+)').firstMatch(buildGradle);
-  final iosMatch = RegExp(r"s\.dependency 'Intercom', '(\d+\.\d+\.\d+)'").firstMatch(podspec);
+  final iosMatch = RegExp(r'exact:\s*"(\d+\.\d+\.\d+)"').firstMatch(packageSwift);
 
   if (androidMatch == null || iosMatch == null) {
     throw StateError('Unable to detect current Intercom SDK versions.');
@@ -212,7 +212,7 @@ Future<void> main(List<String> args) async {
   }
 
   var updatedBuildGradle = buildGradle;
-  var updatedPodspec = podspec;
+  var updatedPackageSwift = packageSwift;
   var updatedReadme = readme;
   var updatedChangelog = changelog;
   var updatedPubspec = pubspec;
@@ -221,7 +221,7 @@ Future<void> main(List<String> args) async {
     updatedBuildGradle = _updateBuildGradle(updatedBuildGradle, latestAndroid);
   }
   if (shouldUpdateIos) {
-    updatedPodspec = _updatePodspec(updatedPodspec, latestIos);
+    updatedPackageSwift = _updatePackageSwift(updatedPackageSwift, latestIos);
   }
 
   updatedReadme = _updateReadme(
@@ -248,8 +248,8 @@ Future<void> main(List<String> args) async {
   if (updatedBuildGradle != buildGradle) {
     _writeFile(buildGradlePath, updatedBuildGradle);
   }
-  if (updatedPodspec != podspec) {
-    _writeFile(podspecPath, updatedPodspec);
+  if (updatedPackageSwift != packageSwift) {
+    _writeFile(packageSwiftPath, updatedPackageSwift);
   }
   if (updatedReadme != readme) {
     _writeFile(readmePath, updatedReadme);
