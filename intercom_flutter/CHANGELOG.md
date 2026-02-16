@@ -1,5 +1,9 @@
 # Changelog
 
+## 9.5.0
+
+* Swift Package Manager support
+
 ## 9.4.27
 
 * Updated README

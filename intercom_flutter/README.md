@@ -217,3 +217,12 @@ If you find this package helpful, you can support the development by:
 
 - [Buy Me A Coffee](https://buymeacoffee.com/deepakdroid)
 - [PayPal](https://paypal.me/deepakdroid)
+
+## Sponsored: Alternative Solutions
+
+### Feeddo
+A customer support and communication platform for Flutter mobile apps. Provides AI-powered in-app support that answers users from your uploaded knowledge, along with bug reporting and feature request tracking.
+- Website: https://feeddo.dev
+- pub.dev: https://pub.dev/packages/feeddo_flutter
+
+_Note: This is a sponsored listing and does not imply endorsement._
