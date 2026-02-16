@@ -39,9 +39,6 @@ void main() {
       expect(intercom, isNotNull);
     });
 
-    testWidgets('TEMPORARY: deliberate failure to verify CI', (_) async {
-      expect(1, equals(2));
-    });
 
     late IntercomFlutterWeb plugin;
 
