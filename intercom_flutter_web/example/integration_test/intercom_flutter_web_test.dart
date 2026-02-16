@@ -16,7 +16,7 @@ void main() {
       globalContext,
       '''
     window.Intercom = function(command, args) {
-      console.log("JS: Intercom called with", command, args);
+      console.log("JS: Intercom called with " + command + " " + JSON.stringify(args));
       window._intercomCalls = window._intercomCalls || [];
       window._intercomCalls.push({command: command, args: args});
     };
