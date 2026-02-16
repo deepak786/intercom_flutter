@@ -92,6 +92,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - uses: nanasess/setup-chromedriver@v2
     - uses: subosito/flutter-action@v2
       with:
         channel: 'stable'
@@ -111,11 +112,13 @@ jobs:
       run: flutter analyze
       working-directory: ${{env.source-directory}}
 
-    # Ensure xvfb is available for headless Chrome
     - name: Install xvfb
       run: |
         sudo apt-get update
         sudo apt-get install -y --no-install-recommends xvfb
+
+    - name: Start chromedriver
+      run: chromedriver --port=4444 &
 
     # Run all integration tests
     - name: Run integration tests
