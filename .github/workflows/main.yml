@@ -19,11 +19,12 @@ jobs:
       source-directory: ./intercom_flutter
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-java@v1
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
       with:
-        java-version: '12.x'
-    - uses: subosito/flutter-action@v1
+        distribution: 'temurin'
+        java-version: '17'
+    - uses: subosito/flutter-action@v2
       with:
         channel: 'stable'
     
@@ -54,11 +55,12 @@ jobs:
       source-directory: ./intercom_flutter_platform_interface
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-java@v1
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
       with:
-        java-version: '12.x'
-    - uses: subosito/flutter-action@v1
+        distribution: 'temurin'
+        java-version: '17'
+    - uses: subosito/flutter-action@v2
       with:
         channel: 'stable'
     
@@ -89,12 +91,11 @@ jobs:
       source-directory: ./intercom_flutter_web/example
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: nanasess/setup-chromedriver@v2
-    - uses: subosito/flutter-action@v1
+    - uses: actions/checkout@v4
+    - uses: subosito/flutter-action@v2
       with:
         channel: 'stable'
-    
+
     # Download all Flutter packages
     - name: Download dependencies
       run: flutter pub get
@@ -110,24 +111,21 @@ jobs:
       run: flutter analyze
       working-directory: ${{env.source-directory}}
 
-    # Run chromedriver (required for flutter drive -d chrome on web)
-    - name: Run chromedriver
-      run: chromedriver --port=4444 &
-      working-directory: ${{env.source-directory}}
-
-    # Run all integration tests (-d chrome with headless so driver gets VM_SERVICE_URL)
-    - name: Run integration tests
-      timeout-minutes: 10
+    # Ensure xvfb is available for headless Chrome
+    - name: Install xvfb
       run: |
         sudo apt-get update
         sudo apt-get install -y --no-install-recommends xvfb
 
-        export CHROME_FLAGS="--no-sandbox --disable-dev-shm-usage --disable-gpu"
-
+    # Run all integration tests
+    - name: Run integration tests
+      timeout-minutes: 10
+      run: |
         xvfb-run -a -s "-screen 0 1920x1080x24" \
           flutter drive \
             --target=integration_test/intercom_flutter_web_test.dart \
             --driver=test_driver/integration_test.dart \
             -d chrome \
-            --dart-define=CI=true
+            --web-browser-flag=--no-sandbox \
+            --web-browser-flag=--disable-gpu
       working-directory: ${{env.source-directory}}

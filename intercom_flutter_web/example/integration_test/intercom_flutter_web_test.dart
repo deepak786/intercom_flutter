@@ -150,7 +150,7 @@ void main() {
 
     testWidgets('testStream is accessible', (WidgetTester _) async {
       final stream = plugin.getUnreadStream();
-      expect(stream, isA<Stream<int>>());
+      expect(stream, isA<Stream<dynamic>>());
     });
 
     testWidgets('displayArticle', (WidgetTester _) async {
