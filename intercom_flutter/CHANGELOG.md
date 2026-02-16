@@ -1,5 +1,23 @@
 # Changelog
 
+## 9.5.0
+
+* Swift Package Manager support
+
+## 9.4.27
+
+* Updated README
+
+## 9.4.26
+
+* Bump Intercom Android SDK version to [17.4.4](https://github.com/intercom/intercom-android/releases/tag/17.4.4)
+* Bump Intercom iOS SDK version to [19.5.1](https://github.com/intercom/intercom-ios/releases/tag/19.5.1)
+
+## 9.4.25
+
+* Bump Intercom Android SDK version to [17.4.3](https://github.com/intercom/intercom-android/releases/tag/17.4.3)
+* Bump Intercom iOS SDK version to [19.5.0](https://github.com/intercom/intercom-ios/releases/tag/19.5.0)
+
 ## 9.4.24
 
 * Bump Intercom Android SDK version to [17.4.2](https://github.com/intercom/intercom-android/releases/tag/17.4.2)
