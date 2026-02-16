@@ -39,7 +39,6 @@ void main() {
       expect(intercom, isNotNull);
     });
 
-
     late IntercomFlutterWeb plugin;
 
     setUp(() {
