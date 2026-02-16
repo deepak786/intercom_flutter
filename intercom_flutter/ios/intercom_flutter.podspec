@@ -12,11 +12,10 @@ A new flutter plugin project.
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'xChange OÜ' => 'maido@getchange.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
-  s.public_header_files = 'Classes/**/*.h'
+  s.source_files = 'intercom_flutter/Sources/intercom_flutter/**/*.{h,m}'
+  s.public_header_files = 'intercom_flutter/Sources/intercom_flutter/include/**/*.h'
   s.dependency 'Flutter'
-  s.dependency 'Intercom'
-  s.static_framework = true
   s.dependency 'Intercom', '19.5.1'
+  s.static_framework = true
   s.ios.deployment_target = '15.0'
 end

@@ -1,4 +1,4 @@
-#import "IntercomFlutterPlugin.h"
+#import "./include/intercom_flutter/IntercomFlutterPlugin.h"
 #import <Intercom/Intercom.h>
 
 id unread;

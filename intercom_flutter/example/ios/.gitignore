@@ -43,3 +43,11 @@ Icon?
 
 Pods/
 .symlinks/
+
+# Flutter generated files
+/Flutter/Flutter.podspec
+/Flutter/ephemeral/
+
+# Swift Package Manager
+/Runner.xcworkspace/xcshareddata/swiftpm/
+/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
