@@ -13,6 +13,10 @@ Future<String> _fetchLatestVersion(Uri url) async {
     final request = await client.getUrl(url);
     request.headers.set(HttpHeaders.userAgentHeader, 'intercom-flutter-sdk-check');
     request.headers.set(HttpHeaders.acceptHeader, 'application/vnd.github+json');
+    final token = Platform.environment['GITHUB_TOKEN'];
+    if (token != null && token.isNotEmpty) {
+      request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $token');
+    }
     final response = await request.close();
     if (response.statusCode != 200) {
       final body = await response.transform(utf8.decoder).join();
