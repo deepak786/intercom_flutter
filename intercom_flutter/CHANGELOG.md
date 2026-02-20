@@ -1,5 +1,10 @@
 # Changelog
 
+## 9.5.1
+
+* Bump Intercom iOS SDK version to [19.5.2](https://github.com/intercom/intercom-ios/releases/tag/19.5.2)
+
+
 ## 9.5.0
 
 * Swift Package Manager support
