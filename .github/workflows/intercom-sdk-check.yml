@@ -27,11 +27,24 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Determine PR title
+        id: pr
+        if: steps.sdk.outputs.updates_available == 'true'
+        run: |
+          if [[ "${{ steps.sdk.outputs.android_updated }}" == "true" && "${{ steps.sdk.outputs.ios_updated }}" == "true" ]]; then
+            echo "title=Update intercom-android ${{ steps.sdk.outputs.android_version }} and intercom-ios ${{ steps.sdk.outputs.ios_version }}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ steps.sdk.outputs.android_updated }}" == "true" ]]; then
+            echo "title=Update intercom-android ${{ steps.sdk.outputs.android_version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "title=Update intercom-ios ${{ steps.sdk.outputs.ios_version }}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create pull request
+        if: steps.sdk.outputs.updates_available == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
-          commit-message: 'Update Intercom SDK versions to ${{ steps.sdk.outputs.android_version }} for Android and ${{ steps.sdk.outputs.ios_version }} for iOS'
-          title: 'Update Intercom SDK versions to ${{ steps.sdk.outputs.android_version }} for Android and ${{ steps.sdk.outputs.ios_version }} for iOS'
+          commit-message: ${{ steps.pr.outputs.title }}
+          title: ${{ steps.pr.outputs.title }}
           body: |
             Automated Intercom SDK update.
 

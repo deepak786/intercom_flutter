@@ -144,7 +144,11 @@ String _updateChangelog(String contents, String version, List<String> entries) {
   updatedLines.add('');
   updatedLines.addAll(newEntries);
   updatedLines.add('');
-  updatedLines.addAll(lines.skip(insertIndex + 1));
+  var remainderStart = insertIndex + 1;
+  while (remainderStart < lines.length && lines[remainderStart].trim().isEmpty) {
+    remainderStart++;
+  }
+  updatedLines.addAll(lines.skip(remainderStart));
   return updatedLines.join('\n');
 }
 
@@ -206,6 +210,8 @@ Future<void> main(List<String> args) async {
   _writeGithubOutputs({
     'android_version': latestAndroid,
     'ios_version': latestIos,
+    'android_updated': shouldUpdateAndroid.toString(),
+    'ios_updated': shouldUpdateIos.toString(),
     'plugin_version': nextPluginVersion,
     'updates_available': shouldUpdate.toString(),
   });
