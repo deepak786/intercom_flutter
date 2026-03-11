@@ -1,5 +1,9 @@
 # Changelog
 
+## 9.5.5
+
+* Bump Intercom iOS SDK version to [19.5.4](https://github.com/intercom/intercom-ios/releases/tag/19.5.4)
+
 ## 9.5.4
 
 * Bump Intercom iOS SDK version to [19.5.3](https://github.com/intercom/intercom-ios/releases/tag/19.5.3)
