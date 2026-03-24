@@ -1,5 +1,9 @@
 # Changelog
 
+## 9.5.6
+
+* Bump Intercom iOS SDK version to [19.5.5](https://github.com/intercom/intercom-ios/releases/tag/19.5.5)
+
 ## 9.5.5
 
 * Bump Intercom Android SDK version to [17.4.7](https://github.com/intercom/intercom-android/releases/tag/17.4.7)
