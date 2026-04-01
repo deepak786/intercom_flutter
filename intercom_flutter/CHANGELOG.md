@@ -1,5 +1,11 @@
 # Changelog
 
+## 9.6.0
+
+* Bump Intercom Android SDK version to [18.0.0](https://github.com/intercom/intercom-android/releases/tag/18.0.0)
+* **BREAKING**: The minimum Android SDK `minSdk` version is now 23
+* **BREAKING**: The target/compile Android SDK version is now 36
+
 ## 9.5.6
 
 * Bump Intercom iOS SDK version to [19.5.5](https://github.com/intercom/intercom-ios/releases/tag/19.5.5)
