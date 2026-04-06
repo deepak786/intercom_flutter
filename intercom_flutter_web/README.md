@@ -21,7 +21,6 @@ But you can pre-define some Intercom settings, if you want (optional), such as `
 - unreadConversationCount
 - setInAppMessagesVisibility
 - sendTokenToIntercom
-- handlePushMessage
 - isIntercomPush
 - handlePush
 - displayCarousel

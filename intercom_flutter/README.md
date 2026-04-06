@@ -144,7 +144,6 @@ But you can pre-define some Intercom settings, if you want (optional).
 - [ ] unreadConversationCount
 - [ ] setInAppMessagesVisibility
 - [ ] sendTokenToIntercom
-- [ ] handlePushMessage
 - [ ] isIntercomPush
 - [ ] handlePush
 - [ ] displayCarousel
