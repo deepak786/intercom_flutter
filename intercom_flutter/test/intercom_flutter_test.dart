@@ -242,6 +242,34 @@ void main() {
     });
   });
 
+  group('WindowDidHide', () {
+    const String channelName = 'maido.io/intercom/windowDidHide';
+    const MethodChannel channel = MethodChannel(channelName);
+    final bool value = true;
+
+    setUp(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .handlePlatformMessage(
+          channelName,
+          const StandardMethodCodec().encodeSuccessEnvelope(value),
+          (ByteData? data) {},
+        );
+        return;
+      });
+    });
+
+    tearDown(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, null);
+    });
+
+    test('testStream', () async {
+      expect(await Intercom.instance.getWindowDidHideStream().first, value);
+    });
+  });
+
   test('displayArticle', () async {
     final String testArticleId = "123456";
     await Intercom.instance.displayArticle(testArticleId);

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.7
+
+* Added method `getWindowDidHideStream`.
+* Removed deprecated `handlePushMessage`.
+
 ## 2.0.6
 
 * Added method `setThemeMode`.

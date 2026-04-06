@@ -46,6 +46,16 @@ abstract class IntercomFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('getUnreadStream() has not been implemented.');
   }
 
+  /// You can listen for when the Intercom window is hidden.
+  ///
+  /// This stream emits when the Intercom window (messenger, help center, etc.) is closed.
+  /// This allows developers to perform certain actions in their app when the Intercom window is closed.
+  /// Only available on iOS.
+  Stream<dynamic> getWindowDidHideStream() {
+    throw UnimplementedError(
+        'getWindowDidHideStream() has not been implemented.');
+  }
+
   /// To make sure that conversations between you and your users are kept private
   /// and that one user can't impersonate another then you need you need to setup
   /// the identity verification.

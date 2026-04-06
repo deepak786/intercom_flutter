@@ -3,6 +3,7 @@
 ## 9.6.2
 
 * Removed deprecated `handlePushMessage` API (removed from native Intercom SDK)
+* Added `getWindowDidHideStream` to listen for when the Intercom window is hidden (iOS only).
 
 ## 9.6.1
 
