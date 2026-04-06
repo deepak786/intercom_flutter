@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intercom_flutter/intercom_flutter.dart';
 
@@ -27,19 +28,21 @@ class _SampleAppState extends State<SampleApp> {
   void initState() {
     super.initState();
     // Listen for when the Intercom window is hidden
-    _windowDidHideSubscription =
-        Intercom.instance.getWindowDidHideStream().listen((_) {
-      // This will be called when the Intercom window is closed
-      // Only works on iOS
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Intercom window was closed!'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-    });
+    if (!kIsWeb) {
+      _windowDidHideSubscription =
+          Intercom.instance.getWindowDidHideStream().listen((_) {
+        // This will be called when the Intercom window is closed
+        // Only works on iOS
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Intercom window was closed!'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      });
+    }
   }
 
   @override
@@ -72,12 +75,14 @@ class _SampleAppState extends State<SampleApp> {
                 },
                 child: Text('Show messenger'),
               ),
-              SizedBox(height: 20),
-              Text(
-                'Close the Intercom window to see the notification!',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16),
-              ),
+              if (!kIsWeb) ...[
+                SizedBox(height: 20),
+                Text(
+                  'Close the Intercom window to see the notification!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16),
+                ),
+              ],
             ],
           ),
         ),
