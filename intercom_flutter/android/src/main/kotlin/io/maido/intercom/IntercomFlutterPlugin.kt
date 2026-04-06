@@ -14,6 +14,12 @@ import io.intercom.android.sdk.identity.Registration
 import io.intercom.android.sdk.push.IntercomPushClient
 import io.intercom.android.sdk.ui.theme.ThemeMode
 
+// No-op stream handler for windowDidHide event since it's only supported on iOS.
+class WindowDidHideStreamHandler : EventChannel.StreamHandler {
+  override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {}
+  override fun onCancel(arguments: Any?) {}
+}
+
 class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHandler, ActivityAware {
   companion object {
     @JvmStatic
@@ -34,7 +40,7 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
     val unreadEventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "maido.io/intercom/unread")
     unreadEventChannel.setStreamHandler(IntercomFlutterPlugin())
     val windowDidHideEventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "maido.io/intercom/windowDidHide")
-    windowDidHideEventChannel.setStreamHandler(IntercomFlutterPlugin())
+    windowDidHideEventChannel.setStreamHandler(WindowDidHideStreamHandler())
     application = flutterPluginBinding.applicationContext as Application
   }
 
@@ -383,22 +389,14 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
   }
 
   override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-    // Check if this is the unread stream or windowDidHide stream
-    // For unread stream, we set up the listener
-    // For windowDidHide stream, we don't set up anything since it's iOS-specific
-    if (arguments == null || arguments.toString().contains("unread") || arguments.toString().isEmpty()) {
-      // This is the unread stream
-      unreadConversationCountListener = UnreadConversationCountListener { count ->
-          val handler = android.os.Handler(android.os.Looper.getMainLooper())
-          handler.post {
-            events?.success(count)
-          }
-        }.also {
-          Intercom.client().addUnreadConversationCountListener(it)
+    unreadConversationCountListener = UnreadConversationCountListener { count ->
+        val handler = android.os.Handler(android.os.Looper.getMainLooper())
+        handler.post {
+          events?.success(count)
         }
-    }
-    // For windowDidHide stream, we don't need to do anything since it's iOS-specific
-    // The stream will not emit any events on Android
+      }.also {
+        Intercom.client().addUnreadConversationCountListener(it)
+      }
   }
 
   override fun onCancel(arguments: Any?) {
