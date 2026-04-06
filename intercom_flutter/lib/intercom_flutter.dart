@@ -210,16 +210,6 @@ class Intercom {
     return IntercomFlutterPlatform.instance.sendTokenToIntercom(token);
   }
 
-  /// When a user taps on a push notification Intercom hold onto data
-  /// such as the URI in your message or the conversation to open.
-  ///
-  /// When you want Intercom to act on that data, use this method.
-  @Deprecated(
-      "Calling this API is no longer required. Intercom will directly open the chat screen when a push notification is clicked.")
-  Future<void> handlePushMessage() {
-    return IntercomFlutterPlatform.instance.handlePushMessage();
-  }
-
   /// To open the Intercom messenger to the composer screen with [message]
   /// field pre-populated.
   Future<void> displayMessageComposer(String message) {

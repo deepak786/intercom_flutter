@@ -175,13 +175,6 @@ class MethodChannelIntercomFlutter extends IntercomFlutterPlatform {
     await _channel.invokeMethod('sendTokenToIntercom', {'token': token});
   }
 
-  @Deprecated(
-      "Calling this API is no longer required. Intercom will directly open the chat screen when a push notification is clicked.")
-  @override
-  Future<void> handlePushMessage() async {
-    await _channel.invokeMethod('handlePushMessage');
-  }
-
   @override
   Future<void> displayMessageComposer(String message) async {
     await _channel.invokeMethod('displayMessageComposer', {'message': message});

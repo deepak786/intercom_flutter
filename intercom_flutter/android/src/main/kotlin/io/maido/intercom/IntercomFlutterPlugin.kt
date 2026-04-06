@@ -202,10 +202,6 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
           result.success("Token sent to Intercom")
         }
       }
-      "handlePushMessage" -> {
-        Intercom.client().handlePushMessage()
-        result.success("Push message handled")
-      }
       "displayMessageComposer" -> {
         if (call.hasArgument("message")) {
           Intercom.client().displayMessageComposer(call.argument("message"))
