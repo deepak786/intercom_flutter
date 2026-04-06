@@ -50,51 +50,6 @@ class App extends StatelessWidget {
 
 See Intercom [Android](https://developers.intercom.com/installing-intercom/docs/intercom-for-android) and [iOS](https://developers.intercom.com/installing-intercom/docs/intercom-for-ios) package documentation for more information.
 
-### Listening for Intercom Window Events
-
-You can listen for when the Intercom window is hidden (closed) using the `getWindowDidHideStream()` method. This is particularly useful for performing actions when users close the Intercom messenger, help center, or other Intercom windows.
-
-**Note:** This feature is only available on iOS.
-
-```dart
-import 'package:flutter/material.dart';
-import 'package:intercom_flutter/intercom_flutter.dart';
-import 'dart:async';
-
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  StreamSubscription? _windowDidHideSubscription;
-
-  @override
-  void initState() {
-    super.initState();
-    _windowDidHideSubscription = Intercom.instance.getWindowDidHideStream().listen((_) {
-      print('Intercom window was closed!');
-    });
-  }
-
-  @override
-  void dispose() {
-    _windowDidHideSubscription?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FlatButton(
-      child: Text('Open Intercom'),
-      onPressed: () async {
-        await Intercom.instance.displayMessenger();
-      },
-    );
-  }
-}
-```
-
 ### Android
 
 Make sure that your app's `MainActivity` extends `FlutterFragmentActivity` (you can check the example).
