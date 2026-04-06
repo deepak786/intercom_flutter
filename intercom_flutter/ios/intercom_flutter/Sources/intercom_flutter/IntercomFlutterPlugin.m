@@ -1,4 +1,4 @@
-#import "IntercomFlutterPlugin.h"
+#import "./include/intercom_flutter/IntercomFlutterPlugin.h"
 #import <Intercom/Intercom.h>
 
 id unread;
@@ -190,9 +190,6 @@ id windowDidHide;
             }
             result(@"Logged event");
         }
-    }
-    else if([@"handlePushMessage" isEqualToString:call.method]) {
-        result(@"No op");
     }
     else if([@"displayMessageComposer" isEqualToString:call.method]) {
         NSString *message = call.arguments[@"message"];

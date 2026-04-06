@@ -19,11 +19,12 @@ jobs:
       source-directory: ./intercom_flutter
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-java@v1
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
       with:
-        java-version: '12.x'
-    - uses: subosito/flutter-action@v1
+        distribution: 'temurin'
+        java-version: '17'
+    - uses: subosito/flutter-action@v2
       with:
         channel: 'stable'
     
@@ -54,11 +55,12 @@ jobs:
       source-directory: ./intercom_flutter_platform_interface
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-java@v1
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
       with:
-        java-version: '12.x'
-    - uses: subosito/flutter-action@v1
+        distribution: 'temurin'
+        java-version: '17'
+    - uses: subosito/flutter-action@v2
       with:
         channel: 'stable'
     
@@ -89,12 +91,12 @@ jobs:
       source-directory: ./intercom_flutter_web/example
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: nanasess/setup-chromedriver@v2      
-    - uses: subosito/flutter-action@v1
+    - uses: actions/checkout@v4
+    - uses: nanasess/setup-chromedriver@v2
+    - uses: subosito/flutter-action@v2
       with:
         channel: 'stable'
-    
+
     # Download all Flutter packages
     - name: Download dependencies
       run: flutter pub get
@@ -110,13 +112,15 @@ jobs:
       run: flutter analyze
       working-directory: ${{env.source-directory}}
 
-    # Run chrome driver
-    - name: Run chrome driver
+    - name: Start chromedriver
       run: chromedriver --port=4444 &
-      working-directory: ${{env.source-directory}}
 
-    # Run all integration tests
     - name: Run integration tests
       timeout-minutes: 10
-      run: flutter drive -d web-server --browser-name=chrome --driver=test_driver/integration_test.dart --target=integration_test/intercom_flutter_web_test.dart
+      run: |
+        flutter drive \
+          -d web-server \
+          --browser-name=chrome \
+          --driver=test_driver/integration_test.dart \
+          --target=integration_test/intercom_flutter_web_test.dart
       working-directory: ${{env.source-directory}}
