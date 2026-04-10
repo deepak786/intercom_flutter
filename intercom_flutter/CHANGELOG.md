@@ -1,5 +1,9 @@
 # Changelog
 
+## 9.6.3
+
+* Fix duplicate Android push notifications by removing `PushInterceptReceiver` from the merged manifest via `tools:node="remove"`. The legacy GCM/C2DM receiver was firing alongside `IntercomFcmMessengerService`, causing every Intercom push to trigger twice.
+
 ## 9.6.2
 
 * Removed deprecated `handlePushMessage` API (removed from native Intercom SDK)
