@@ -1,11 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
   package="io.maido.intercom">
 
   <application>
     <receiver
       android:name="io.maido.intercom.PushInterceptReceiver"
       android:exported="true"
-      android:permission="com.google.android.c2dm.permission.SEND">
+      android:permission="com.google.android.c2dm.permission.SEND"
+      tools:node="remove">
       <intent-filter>
         <action android:name="com.google.android.c2dm.intent.RECEIVE" />
       </intent-filter>
