@@ -1,6 +1,8 @@
 package io.maido.intercom
 
 import android.app.Application
+import android.os.Handler
+import android.os.Looper
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -13,6 +15,7 @@ import io.intercom.android.sdk.*
 import io.intercom.android.sdk.identity.Registration
 import io.intercom.android.sdk.push.IntercomPushClient
 import io.intercom.android.sdk.ui.theme.ThemeMode
+import java.util.concurrent.CountDownLatch
 
 // No-op stream handler for windowDidHide event since it's only supported on iOS.
 class WindowDidHideStreamHandler : EventChannel.StreamHandler {
@@ -25,9 +28,45 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
     @JvmStatic
     lateinit var application: Application
 
+    // Intercom.initialize does blocking Android Keystore operations internally (via runBlocking).
+    // Calling it on the main thread causes ANRs. The latch lets method calls that arrive before
+    // initialization finishes wait on a background thread instead of blocking the main thread.
+    private val initLatch = CountDownLatch(1)
+    private val isInitialized get() = initLatch.count == 0L
+
     @JvmStatic
     fun initSdk(application: Application, appId: String, androidApiKey: String) {
-      Intercom.initialize(application, apiKey = androidApiKey, appId = appId)
+      Thread({
+        Intercom.initialize(application, apiKey = androidApiKey, appId = appId)
+        initLatch.countDown()
+      }, "intercom-init").apply {
+        isDaemon = true
+        start()
+      }
+    }
+
+    // Runs [block] on the main thread, waiting for init on a background thread if needed.
+    // Fast-path: if already initialized, runs [block] immediately with no extra thread.
+    internal fun runAfterInit(result: Result, block: () -> Unit) {
+      if (isInitialized) {
+        try {
+          block()
+        } catch (e: Exception) {
+          result.error("INTERCOM_ERROR", e.message, null)
+        }
+        return
+      }
+      val mainHandler = Handler(Looper.getMainLooper())
+      Thread {
+        initLatch.await()
+        mainHandler.post {
+          try {
+            block()
+          } catch (e: Exception) {
+            result.error("INTERCOM_ERROR", e.message, null)
+          }
+        }
+      }.start()
     }
   }
 
@@ -50,6 +89,10 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
   }
 
   override fun onMethodCall(call: MethodCall, result: Result) {
+    runAfterInit(result) { dispatch(call, result) }
+  }
+
+  private fun dispatch(call: MethodCall, result: Result) {
     when (call.method) {
       "initialize" -> {
         val apiKey = call.argument<String>("androidApiKey")
@@ -206,7 +249,6 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
         val token = call.argument<String>("token")
         if (token != null) {
           intercomPushClient.sendTokenToIntercom(application, token)
-
           result.success("Token sent to Intercom")
         }
       }
