@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
-const _androidReleaseUrl = 'https://api.github.com/repos/intercom/intercom-android/releases/latest';
-const _iosReleaseUrl = 'https://api.github.com/repos/intercom/intercom-ios/releases/latest';
+const _androidRepo = 'intercom/intercom-android';
+const _iosRepo = 'intercom/intercom-ios';
 
 const _androidReleasePage = 'https://github.com/intercom/intercom-android/releases';
 const _iosReleasePage = 'https://github.com/intercom/intercom-ios/releases';
 
-Future<String> _fetchLatestVersion(Uri url) async {
+Future<dynamic> _githubGet(Uri url) async {
   final client = HttpClient();
   try {
     final request = await client.getUrl(url);
@@ -18,21 +18,74 @@ Future<String> _fetchLatestVersion(Uri url) async {
       request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $token');
     }
     final response = await request.close();
+    final body = await response.transform(utf8.decoder).join();
     if (response.statusCode != 200) {
-      final body = await response.transform(utf8.decoder).join();
       throw StateError('GitHub API error ${response.statusCode}: $body');
     }
-    final body = await response.transform(utf8.decoder).join();
-    final data = jsonDecode(body) as Map<String, dynamic>;
-    final tag = (data['tag_name'] ?? data['name'] ?? '').toString();
-    final match = RegExp(r'(\d+\.\d+\.\d+)').firstMatch(tag);
-    if (match == null) {
-      throw StateError('Unable to parse version from $tag');
-    }
-    return match.group(1)!;
+    return jsonDecode(body);
   } finally {
     client.close();
   }
+}
+
+String? _parseVersion(String tag) {
+  final match = RegExp(r'(\d+\.\d+\.\d+)').firstMatch(tag);
+  return match?.group(1);
+}
+
+Future<String?> _fetchLatestReleaseVersion(String repo) async {
+  try {
+    final data = await _githubGet(
+      Uri.parse('https://api.github.com/repos/$repo/releases/latest'),
+    ) as Map<String, dynamic>;
+    final tag = (data['tag_name'] ?? data['name'] ?? '').toString();
+    return _parseVersion(tag);
+  } on StateError catch (error) {
+    if (error.toString().contains('404')) {
+      return null;
+    }
+    rethrow;
+  }
+}
+
+Future<String?> _fetchLatestTagVersion(String repo) async {
+  final data = await _githubGet(
+    Uri.parse('https://api.github.com/repos/$repo/tags?per_page=100'),
+  ) as List<dynamic>;
+
+  String? latest;
+  for (final tag in data) {
+    final name = (tag as Map<String, dynamic>)['name']?.toString() ?? '';
+    final version = _parseVersion(name);
+    if (version == null) {
+      continue;
+    }
+    if (latest == null || _compareVersions(version, latest) > 0) {
+      latest = version;
+    }
+  }
+  return latest;
+}
+
+Future<String> _fetchLatestVersion(String repo) async {
+  final releaseVersion = await _fetchLatestReleaseVersion(repo);
+  final tagVersion = await _fetchLatestTagVersion(repo);
+
+  if (releaseVersion == null && tagVersion == null) {
+    throw StateError('Unable to determine latest version for $repo');
+  }
+  if (releaseVersion == null) {
+    return tagVersion!;
+  }
+  if (tagVersion == null) {
+    return releaseVersion;
+  }
+  if (_compareVersions(tagVersion, releaseVersion) > 0) {
+    stdout.writeln(
+      'Note: Latest tag ($tagVersion) is newer than latest release ($releaseVersion) for $repo',
+    );
+  }
+  return _compareVersions(tagVersion, releaseVersion) >= 0 ? tagVersion : releaseVersion;
 }
 
 int _compareVersions(String left, String right) {
@@ -194,8 +247,8 @@ Future<void> main(List<String> args) async {
   stdout.writeln('Current Android SDK: $currentAndroid');
   stdout.writeln('Current iOS SDK: $currentIos');
 
-  final latestAndroid = await _fetchLatestVersion(Uri.parse(_androidReleaseUrl));
-  final latestIos = await _fetchLatestVersion(Uri.parse(_iosReleaseUrl));
+  final latestAndroid = await _fetchLatestVersion(_androidRepo);
+  final latestIos = await _fetchLatestVersion(_iosRepo);
 
   stdout.writeln('Latest Android SDK: $latestAndroid');
   stdout.writeln('Latest iOS SDK: $latestIos');
