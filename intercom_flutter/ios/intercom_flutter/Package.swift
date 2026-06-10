@@ -12,7 +12,7 @@ let package = Package(
         .library(name: "intercom-flutter", targets: ["intercom_flutter"])
     ],
     dependencies: [
-        .package(url: "https://github.com/intercom/intercom-ios-sp.git", exact: "19.6.2")
+        .package(url: "https://github.com/intercom/intercom-ios-sp.git", exact: "19.6.3")
     ],
     targets: [
         .target(
