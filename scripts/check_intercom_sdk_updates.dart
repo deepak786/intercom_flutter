@@ -29,7 +29,9 @@ Future<dynamic> _githubGet(Uri url) async {
 }
 
 String? _parseVersion(String tag) {
-  final match = RegExp(r'(\d+\.\d+\.\d+)').firstMatch(tag);
+  // Only accept stable versions (e.g. "19.6.5" or "v19.6.5"). Tags with
+  // pre-release suffixes such as "19.7.0-preauth.1" must be ignored.
+  final match = RegExp(r'^v?(\d+\.\d+\.\d+)$').firstMatch(tag.trim());
   return match?.group(1);
 }
 
