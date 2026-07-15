@@ -25,6 +25,8 @@ But you can pre-define some Intercom settings, if you want (optional), such as `
 - handlePush
 - displayCarousel
 - displayHelpCenterCollections
+- getWindowDidHideStream
+- suppressProactiveContent
 
 [1]: ../intercom_flutter
 
