@@ -8,7 +8,7 @@ import 'package:intercom_flutter_platform_interface/intercom_status_callback.dar
 
 /// export the [IntercomVisibility] enum
 export 'package:intercom_flutter_platform_interface/enumeral.dart'
-    show IntercomVisibility, IntercomTheme;
+    show IntercomVisibility, IntercomTheme, IntercomProactiveContentType;
 export 'package:intercom_flutter_platform_interface/intercom_status_callback.dart'
     show IntercomStatusCallback, IntercomError;
 
@@ -311,5 +311,17 @@ class Intercom {
   /// override the server-provided theme setting for the current session only.
   Future<void> setThemeMode(IntercomTheme theme) {
     return IntercomFlutterPlatform.instance.setThemeMode(theme);
+  }
+
+  /// To suppress the given proactive content [types] (carousels, surveys)
+  /// from being displayed.
+  ///
+  /// All the proactive content types are visible by default.
+  /// Pass an empty list to unsuppress all.
+  ///
+  /// Note: this is not supported on web.
+  Future<void> suppressProactiveContent(
+      List<IntercomProactiveContentType> types) {
+    return IntercomFlutterPlatform.instance.suppressProactiveContent(types);
   }
 }

@@ -303,6 +303,20 @@ id windowDidHide;
                                            details: [self getIntercomError:errorCode:errorMsg]]);
             }];
         }
+    } else if([@"suppressProactiveContent" isEqualToString:call.method]) {
+        NSArray *types = call.arguments[@"types"];
+        NSMutableArray<NSNumber *> *contentTypes = [NSMutableArray array];
+        if(types != (id)[NSNull null] && types != nil) {
+            for (NSString *type in types) {
+                if([@"carousel" isEqualToString:type]) {
+                    [contentTypes addObject:@(IntercomProactiveContentTypeCarousel)];
+                } else if([@"survey" isEqualToString:type]) {
+                    [contentTypes addObject:@(IntercomProactiveContentTypeSurvey)];
+                }
+            }
+        }
+        [Intercom suppressProactiveContent:contentTypes];
+        result(@"Suppressed proactive content");
     } else if([@"setThemeMode" isEqualToString:call.method]) {
         NSString *theme = call.arguments[@"theme"];
         

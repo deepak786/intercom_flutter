@@ -4,6 +4,9 @@
 
 * Bump Intercom Android SDK version to [18.5.0](https://github.com/intercom/intercom-android/releases/tag/18.5.0)
 * Bump Intercom iOS SDK version to [19.7.0](https://github.com/intercom/intercom-ios/releases/tag/19.7.0)
+* Added API `suppressProactiveContent` to control which proactive content types (carousels, surveys) can be displayed. Not supported on web.
+* Updated dependency `intercom_flutter_platform_interface: ^2.0.8`
+* Updated dependency `intercom_flutter_web: ^1.1.13`
 
 ## 9.6.16
 
