@@ -3,6 +3,13 @@ enum IntercomVisibility {
   visible,
 }
 
+/// Proactive content types whose visibility can be controlled via
+/// `suppressProactiveContent`.
+enum IntercomProactiveContentType {
+  carousel,
+  survey,
+}
+
 enum IntercomTheme {
   // // Enable dark mode
   dark,

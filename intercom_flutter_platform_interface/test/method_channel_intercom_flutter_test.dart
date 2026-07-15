@@ -530,6 +530,35 @@ void main() {
         );
       });
     });
+
+    group('suppressProactiveContent', () {
+      test('suppress carousel and survey', () async {
+        await intercom.suppressProactiveContent([
+          IntercomProactiveContentType.carousel,
+          IntercomProactiveContentType.survey,
+        ]);
+        expect(
+          log,
+          <Matcher>[
+            isMethodCall('suppressProactiveContent', arguments: {
+              'types': ['carousel', 'survey'],
+            })
+          ],
+        );
+      });
+
+      test('unsuppress all', () async {
+        await intercom.suppressProactiveContent([]);
+        expect(
+          log,
+          <Matcher>[
+            isMethodCall('suppressProactiveContent', arguments: {
+              'types': [],
+            })
+          ],
+        );
+      });
+    });
   });
 }
 

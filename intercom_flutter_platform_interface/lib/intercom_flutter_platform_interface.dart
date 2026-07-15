@@ -302,4 +302,15 @@ abstract class IntercomFlutterPlatform extends PlatformInterface {
   Future<void> setThemeMode(IntercomTheme theme) {
     throw UnimplementedError('setThemeMode() has not been implemented.');
   }
+
+  /// To suppress the given proactive content [types] (carousels, surveys)
+  /// from being displayed.
+  ///
+  /// All the proactive content types are visible by default.
+  /// Pass an empty list to unsuppress all.
+  Future<void> suppressProactiveContent(
+      List<IntercomProactiveContentType> types) {
+    throw UnimplementedError(
+        'suppressProactiveContent() has not been implemented.');
+  }
 }
