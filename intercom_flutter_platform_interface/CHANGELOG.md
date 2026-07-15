@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.8
+
+* Added method `suppressProactiveContent`.
+
 ## 2.0.7
 
 * Added method `getWindowDidHideStream`.

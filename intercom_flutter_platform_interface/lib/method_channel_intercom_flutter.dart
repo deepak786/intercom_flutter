@@ -271,6 +271,14 @@ class MethodChannelIntercomFlutter extends IntercomFlutterPlatform {
     await _channel.invokeMethod('setThemeMode', {'theme': theme.name});
   }
 
+  @override
+  Future<void> suppressProactiveContent(
+      List<IntercomProactiveContentType> types) async {
+    await _channel.invokeMethod('suppressProactiveContent', {
+      'types': types.map((type) => type.name).toList(),
+    });
+  }
+
   /// Convert the [PlatformException] details to [IntercomError].
   /// From the Platform side if the intercom operation failed then error details
   /// will be sent as details in [PlatformException].

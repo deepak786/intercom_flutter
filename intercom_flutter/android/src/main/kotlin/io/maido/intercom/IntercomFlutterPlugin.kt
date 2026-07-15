@@ -303,6 +303,18 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
           })
         }
       }
+      "suppressProactiveContent" -> {
+        val types = call.argument<List<String>>("types") ?: emptyList()
+        val contentTypes = types.mapNotNull { type ->
+          when (type) {
+            "carousel" -> Intercom.ContentType.CAROUSEL
+            "survey" -> Intercom.ContentType.SURVEY
+            else -> null
+          }
+        }
+        Intercom.client().suppressProactiveContent(contentTypes)
+        result.success("Suppressed proactive content: $types")
+      }
       "setThemeMode" -> {
         val theme = call.argument<String>("theme")
         when (theme) {

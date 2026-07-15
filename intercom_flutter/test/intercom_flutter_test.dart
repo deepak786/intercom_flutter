@@ -355,4 +355,23 @@ void main() {
       });
     });
   });
+
+  group('suppressProactiveContent', () {
+    test('suppress carousel and survey', () {
+      Intercom.instance.suppressProactiveContent([
+        IntercomProactiveContentType.carousel,
+        IntercomProactiveContentType.survey,
+      ]);
+      expectMethodCall('suppressProactiveContent', arguments: {
+        'types': ['carousel', 'survey'],
+      });
+    });
+
+    test('unsuppress all', () {
+      Intercom.instance.suppressProactiveContent([]);
+      expectMethodCall('suppressProactiveContent', arguments: {
+        'types': [],
+      });
+    });
+  });
 }

@@ -149,6 +149,7 @@ But you can pre-define some Intercom settings, if you want (optional).
 - [ ] displayCarousel
 - [ ] displayHelpCenterCollections
 - [ ] getWindowDidHideStream
+- [ ] suppressProactiveContent
 
 ## Using Intercom keys with `--dart-define`
 
