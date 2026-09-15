@@ -8,7 +8,7 @@ Flutter wrapper for Intercom [Android](https://github.com/intercom/intercom-andr
 - Uses Intercom Android SDK Version `18.9.3`.
 - The minimum Android SDK `minSdk` required is 23.
 - The compile Android SDK `compileSdk` required is 36.
-- Uses Intercom iOS SDK Version `19.8.1`.
+- Uses Intercom iOS SDK Version `19.8.2`.
 - The minimum iOS target version required is 15.
 - The Xcode version required is 15.
 
