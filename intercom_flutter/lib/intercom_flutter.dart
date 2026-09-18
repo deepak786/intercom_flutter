@@ -21,6 +21,15 @@ class Intercom {
   /// get the instance of the [Intercom].
   static Intercom get instance => _instance;
 
+  /// Completes when [initialize] finishes.
+  ///
+  /// On Android, initialization runs off the main thread to avoid ANRs caused
+  /// by blocking Keystore operations inside the Intercom SDK. Await this future
+  /// if you need to guarantee the SDK is ready before calling other methods,
+  /// although the plugin itself queues calls automatically while init is pending.
+  static Future<void> get initialized => _initCompleter.future;
+  static final Completer<void> _initCompleter = Completer<void>();
+
   /// Function to initialize the Intercom SDK.
   ///
   /// First, you'll need to get your Intercom [appId].
@@ -36,9 +45,10 @@ class Intercom {
     String appId, {
     String? androidApiKey,
     String? iosApiKey,
-  }) {
-    return IntercomFlutterPlatform.instance
+  }) async {
+    await IntercomFlutterPlatform.instance
         .initialize(appId, androidApiKey: androidApiKey, iosApiKey: iosApiKey);
+    if (!_initCompleter.isCompleted) _initCompleter.complete();
   }
 
   /// You can check how many unread conversations a user has
