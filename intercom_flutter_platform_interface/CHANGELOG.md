@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.9
+
+* Added methods `setUserJwtProvider` and `removeUserJwtProvider`.
+
 ## 2.0.8
 
 * Added method `suppressProactiveContent`.

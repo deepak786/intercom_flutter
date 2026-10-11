@@ -34,14 +34,13 @@ void main() {
   group('$MethodChannelIntercomFlutter', () {
     const MethodChannel channel = MethodChannel('maido.io/intercom');
     final List<MethodCall> log = <MethodCall>[];
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+    Future<Object?> logOutboundMethodCall(MethodCall methodCall) async {
       log.add(methodCall);
-
-      // Return null explicitly instead of relying on the implicit null
-      // returned by the method channel if no return statement is specified.
       return null;
-    });
+    }
+
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, logOutboundMethodCall);
 
     final MethodChannelIntercomFlutter intercom =
         MethodChannelIntercomFlutter();
@@ -469,6 +468,75 @@ void main() {
       );
     });
 
+    test('setUserJwtProvider', () async {
+      await intercom.setUserJwtProvider(() async => 'fresh-jwt');
+      expect(
+        log,
+        <Matcher>[isMethodCall('setUserJwtProvider', arguments: null)],
+      );
+    });
+
+    test('provideUserJwt returns the provider value', () async {
+      await intercom.setUserJwtProvider(() async => 'fresh-jwt');
+      final result =
+          await _invokeProvideUserJwt(channel, logOutboundMethodCall);
+      expect(result, 'fresh-jwt');
+    });
+
+    test('provideUserJwt returns null when the provider returns null',
+        () async {
+      await intercom.setUserJwtProvider(() async => null);
+      final result =
+          await _invokeProvideUserJwt(channel, logOutboundMethodCall);
+      expect(result, isNull);
+    });
+
+    test('provideUserJwt returns null when the provider returns empty',
+        () async {
+      await intercom.setUserJwtProvider(() async => '');
+      final result =
+          await _invokeProvideUserJwt(channel, logOutboundMethodCall);
+      expect(result, isNull);
+    });
+
+    test('provideUserJwt returns null when the provider throws', () async {
+      await intercom.setUserJwtProvider(() async => throw StateError('fail'));
+      final result =
+          await _invokeProvideUserJwt(channel, logOutboundMethodCall);
+      expect(result, isNull);
+    });
+
+    test('unknown inbound method is reported as not implemented', () async {
+      await intercom.setUserJwtProvider(() async => 'fresh-jwt');
+      const codec = StandardMethodCodec();
+      final messenger =
+          TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+      messenger.setMockMethodCallHandler(channel, null);
+      try {
+        final reply = await messenger.handlePlatformMessage(
+          channel.name,
+          codec.encodeMethodCall(const MethodCall('unknownMethod')),
+          (_) {},
+        );
+        expect(reply, isNull);
+      } finally {
+        messenger.setMockMethodCallHandler(channel, logOutboundMethodCall);
+      }
+    });
+
+    test('removeUserJwtProvider', () async {
+      await intercom.setUserJwtProvider(() async => 'fresh-jwt');
+      log.clear();
+      await intercom.removeUserJwtProvider();
+      expect(
+        log,
+        <Matcher>[isMethodCall('removeUserJwtProvider', arguments: null)],
+      );
+      final result =
+          await _invokeProvideUserJwt(channel, logOutboundMethodCall);
+      expect(result, isNull);
+    });
+
     test('setAuthTokens', () async {
       await intercom.setAuthTokens({'security_token': 'test'});
       expect(
@@ -560,6 +628,32 @@ void main() {
       });
     });
   });
+}
+
+/// Simulates native → Dart `provideUserJwt`. Clears the outbound mock so the
+/// inbound [MethodChannel.setMethodCallHandler] registered by
+/// [MethodChannelIntercomFlutter] receives the message.
+Future<Object?> _invokeProvideUserJwt(
+  MethodChannel channel,
+  Future<Object?> Function(MethodCall) restoreMockHandler,
+) async {
+  const codec = StandardMethodCodec();
+  final messenger =
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+  messenger.setMockMethodCallHandler(channel, null);
+  try {
+    final reply = await messenger.handlePlatformMessage(
+      channel.name,
+      codec.encodeMethodCall(const MethodCall('provideUserJwt')),
+      (_) {},
+    );
+    if (reply == null) {
+      return null;
+    }
+    return codec.decodeEnvelope(reply);
+  } finally {
+    messenger.setMockMethodCallHandler(channel, restoreMockHandler);
+  }
 }
 
 class IntercomFlutterPlatformMock extends Mock

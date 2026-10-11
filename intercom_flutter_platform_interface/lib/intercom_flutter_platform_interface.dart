@@ -3,6 +3,11 @@ import 'package:intercom_flutter_platform_interface/intercom_status_callback.dar
 import 'package:intercom_flutter_platform_interface/method_channel_intercom_flutter.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
+/// Supplies a fresh user JWT when the native SDK asks for one.
+///
+/// Return the new token, or `null` when one cannot be supplied.
+typedef UserJwtProvider = Future<String?> Function();
+
 abstract class IntercomFlutterPlatform extends PlatformInterface {
   IntercomFlutterPlatform() : super(token: _token);
 
@@ -285,6 +290,36 @@ abstract class IntercomFlutterPlatform extends PlatformInterface {
   /// see their conversation history, or make unauthorized updates to data.
   Future<void> setUserJwt(String jwt) {
     throw UnimplementedError('setUserJwt() has not been implemented.');
+  }
+
+  /// Registers a callback that supplies a fresh user JWT when the current one
+  /// is about to expire or has been rejected.
+  ///
+  /// The native SDK calls [provider] and retries the failed request once with
+  /// the returned token. Return `null` when a token cannot be supplied.
+  /// An empty string or a thrown error is treated the same as `null`.
+  ///
+  /// Set the first token with [setUserJwt] before login. This callback only
+  /// supplies later tokens. Call [removeUserJwtProvider] to stop asking.
+  ///
+  /// On iOS and Android, the SDK stops waiting after 10 seconds. This plugin
+  /// does not add its own timeout.
+  ///
+  /// Note: this is not supported on web. Call [setUserJwt] again to refresh
+  /// the token there.
+  Future<void> setUserJwtProvider(UserJwtProvider provider) {
+    throw UnimplementedError('setUserJwtProvider() has not been implemented.');
+  }
+
+  /// Stops asking for fresh user JWTs.
+  ///
+  /// Requests rejected for an expired JWT fail until [setUserJwt] is called
+  /// with a new token.
+  ///
+  /// Note: this is not supported on web.
+  Future<void> removeUserJwtProvider() {
+    throw UnimplementedError(
+        'removeUserJwtProvider() has not been implemented.');
   }
 
   /// Set up the authentication (user-defined token) to secure your Data

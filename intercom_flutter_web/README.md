@@ -27,6 +27,8 @@ But you can pre-define some Intercom settings, if you want (optional), such as `
 - displayHelpCenterCollections
 - getWindowDidHideStream
 - suppressProactiveContent
+- setUserJwtProvider
+- removeUserJwtProvider
 
 [1]: ../intercom_flutter
 

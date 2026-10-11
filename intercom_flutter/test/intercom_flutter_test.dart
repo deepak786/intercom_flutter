@@ -319,6 +319,16 @@ void main() {
     });
   });
 
+  test('setUserJwtProvider', () {
+    Intercom.instance.setUserJwtProvider(() async => 'fresh-jwt');
+    expectMethodCall('setUserJwtProvider');
+  });
+
+  test('removeUserJwtProvider', () {
+    Intercom.instance.removeUserJwtProvider();
+    expectMethodCall('removeUserJwtProvider');
+  });
+
   test('setAuthTokens', () {
     Intercom.instance.setAuthTokens({'security_token': 'test'});
     expectMethodCall('setAuthTokens', arguments: {

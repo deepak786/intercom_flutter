@@ -33,12 +33,16 @@ id windowDidHide;
 }
 @end
 
-@implementation IntercomFlutterPlugin
+@implementation IntercomFlutterPlugin {
+    FlutterMethodChannel *_channel;
+}
+
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     IntercomFlutterPlugin* instance = [[IntercomFlutterPlugin alloc] init];
     FlutterMethodChannel* channel =
     [FlutterMethodChannel methodChannelWithName:@"maido.io/intercom"
                                 binaryMessenger:[registrar messenger]];
+    instance->_channel = channel;
     [registrar addMethodCallDelegate:instance channel:channel];
     FlutterEventChannel* unreadChannel = [FlutterEventChannel eventChannelWithName:@"maido.io/intercom/unread"
     binaryMessenger:[registrar messenger]];
@@ -287,6 +291,31 @@ id windowDidHide;
         NSString *jwt = call.arguments[@"jwt"];
         [Intercom setUserJwt:jwt];
         result(@"Jwt added");
+    } else if([@"setUserJwtProvider" isEqualToString:call.method]) {
+        __weak FlutterMethodChannel *channel = _channel;
+        [Intercom setUserJwtProvider:^(void (^completion)(NSString * _Nullable jwt)) {
+            FlutterMethodChannel *strongChannel = channel;
+            if (strongChannel == nil) {
+                completion(nil);
+                return;
+            }
+            __block BOOL completed = NO;
+            [strongChannel invokeMethod:@"provideUserJwt" arguments:nil result:^(id result) {
+                if (completed) {
+                    return;
+                }
+                completed = YES;
+                if ([result isKindOfClass:[NSString class]] && [(NSString *)result length] > 0) {
+                    completion(result);
+                } else {
+                    completion(nil);
+                }
+            }];
+        }];
+        result(@"User JWT provider set");
+    } else if([@"removeUserJwtProvider" isEqualToString:call.method]) {
+        [Intercom removeUserJwtProvider];
+        result(@"User JWT provider removed");
     } else if([@"setAuthTokens" isEqualToString:call.method]) {
         NSDictionary *tokens = call.arguments[@"tokens"];
         if (tokens != nil && [tokens count] > 0) {

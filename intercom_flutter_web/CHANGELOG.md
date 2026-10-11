@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.14
+
+* Updated `intercom_flutter_platform_interface` to `^2.0.9`.
+
 ## 1.1.13
 
 * Updated `intercom_flutter_platform_interface` to `^2.0.8`.

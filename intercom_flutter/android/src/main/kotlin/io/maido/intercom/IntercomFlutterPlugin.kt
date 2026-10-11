@@ -1,6 +1,8 @@
 package io.maido.intercom
 
 import android.app.Application
+import android.os.Handler
+import android.os.Looper
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -13,6 +15,7 @@ import io.intercom.android.sdk.*
 import io.intercom.android.sdk.identity.Registration
 import io.intercom.android.sdk.push.IntercomPushClient
 import io.intercom.android.sdk.ui.theme.ThemeMode
+import java.util.concurrent.atomic.AtomicBoolean
 
 // No-op stream handler for windowDidHide event since it's only supported on iOS.
 class WindowDidHideStreamHandler : EventChannel.StreamHandler {
@@ -33,10 +36,13 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
 
   private val intercomPushClient = IntercomPushClient()
   private var unreadConversationCountListener: UnreadConversationCountListener? = null
+  private var channel: MethodChannel? = null
 
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    val channel = MethodChannel(flutterPluginBinding.binaryMessenger, "maido.io/intercom")
-    channel.setMethodCallHandler(IntercomFlutterPlugin())
+    val methodChannel = MethodChannel(flutterPluginBinding.binaryMessenger, "maido.io/intercom")
+    val plugin = IntercomFlutterPlugin()
+    plugin.channel = methodChannel
+    methodChannel.setMethodCallHandler(plugin)
     val unreadEventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "maido.io/intercom/unread")
     unreadEventChannel.setStreamHandler(IntercomFlutterPlugin())
     val windowDidHideEventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "maido.io/intercom/windowDidHide")
@@ -280,6 +286,48 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
           Intercom.client().setUserJwt(jwt)
           result.success("Jwt added")
         }
+      }
+      "setUserJwtProvider" -> {
+        val methodChannel = channel
+        Intercom.client().setUserJwtProvider(object : IntercomUserJwtProvider {
+          override fun provideUserJwt(callback: IntercomUserJwtCallback) {
+            if (methodChannel == null) {
+              callback.onFailure()
+              return
+            }
+            Handler(Looper.getMainLooper()).post {
+              val completed = AtomicBoolean(false)
+              methodChannel.invokeMethod("provideUserJwt", null, object : MethodChannel.Result {
+                override fun success(result: Any?) {
+                  if (!completed.compareAndSet(false, true)) return
+                  val jwt = result as? String
+                  if (!jwt.isNullOrBlank()) {
+                    callback.onSuccess(jwt)
+                  } else {
+                    callback.onFailure()
+                  }
+                }
+
+                override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
+                  if (completed.compareAndSet(false, true)) {
+                    callback.onFailure()
+                  }
+                }
+
+                override fun notImplemented() {
+                  if (completed.compareAndSet(false, true)) {
+                    callback.onFailure()
+                  }
+                }
+              })
+            }
+          }
+        })
+        result.success("User JWT provider set")
+      }
+      "removeUserJwtProvider" -> {
+        Intercom.client().removeUserJwtProvider()
+        result.success("User JWT provider removed")
       }
       "setAuthTokens" -> {
         val tokens = call.argument<Map<String, String>>("tokens")

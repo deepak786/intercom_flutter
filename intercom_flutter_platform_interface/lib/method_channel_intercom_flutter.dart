@@ -10,6 +10,44 @@ const EventChannel _windowDidHideChannel =
 
 /// An implementation of [IntercomFlutterPlatform] that uses method channels.
 class MethodChannelIntercomFlutter extends IntercomFlutterPlatform {
+  static UserJwtProvider? _userJwtProvider;
+  static bool _isMethodCallHandlerSet = false;
+
+  /// Registers the single handler for calls from native code on [_channel].
+  ///
+  /// A channel holds only one handler, so every inbound method must be
+  /// dispatched from [_handleMethodCall] and registered only through here.
+  static void _ensureMethodCallHandler() {
+    if (_isMethodCallHandlerSet) return;
+    _channel.setMethodCallHandler(_handleMethodCall);
+    _isMethodCallHandlerSet = true;
+  }
+
+  static Future<dynamic> _handleMethodCall(MethodCall call) async {
+    switch (call.method) {
+      case 'provideUserJwt':
+        return _provideUserJwt();
+      default:
+        throw MissingPluginException();
+    }
+  }
+
+  static Future<String?> _provideUserJwt() async {
+    final provider = _userJwtProvider;
+    if (provider == null) {
+      return null;
+    }
+    try {
+      final jwt = await provider();
+      if (jwt == null || jwt.isEmpty) {
+        return null;
+      }
+      return jwt;
+    } catch (_) {
+      return null;
+    }
+  }
+
   @override
   Future<void> initialize(
     String appId, {
@@ -259,6 +297,19 @@ class MethodChannelIntercomFlutter extends IntercomFlutterPlatform {
   @override
   Future<void> setUserJwt(String jwt) async {
     await _channel.invokeMethod('setUserJwt', {'jwt': jwt});
+  }
+
+  @override
+  Future<void> setUserJwtProvider(UserJwtProvider provider) async {
+    _userJwtProvider = provider;
+    _ensureMethodCallHandler();
+    await _channel.invokeMethod('setUserJwtProvider');
+  }
+
+  @override
+  Future<void> removeUserJwtProvider() async {
+    _userJwtProvider = null;
+    await _channel.invokeMethod('removeUserJwtProvider');
   }
 
   @override

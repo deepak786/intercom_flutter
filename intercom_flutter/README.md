@@ -150,6 +150,8 @@ But you can pre-define some Intercom settings, if you want (optional).
 - [ ] displayHelpCenterCollections
 - [ ] getWindowDidHideStream
 - [ ] suppressProactiveContent
+- [ ] setUserJwtProvider
+- [ ] removeUserJwtProvider
 
 ## Using Intercom keys with `--dart-define`
 

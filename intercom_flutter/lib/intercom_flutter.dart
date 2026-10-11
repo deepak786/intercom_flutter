@@ -9,6 +9,8 @@ import 'package:intercom_flutter_platform_interface/intercom_status_callback.dar
 /// export the [IntercomVisibility] enum
 export 'package:intercom_flutter_platform_interface/enumeral.dart'
     show IntercomVisibility, IntercomTheme, IntercomProactiveContentType;
+export 'package:intercom_flutter_platform_interface/intercom_flutter_platform_interface.dart'
+    show UserJwtProvider;
 export 'package:intercom_flutter_platform_interface/intercom_status_callback.dart'
     show IntercomStatusCallback, IntercomError;
 
@@ -295,6 +297,35 @@ class Intercom {
   /// see their conversation history, or make unauthorized updates to data.
   Future<void> setUserJwt(String jwt) {
     return IntercomFlutterPlatform.instance.setUserJwt(jwt);
+  }
+
+  /// Registers a callback that supplies a fresh user JWT when the current one
+  /// is about to expire or has been rejected.
+  ///
+  /// The native SDK calls [provider] and retries the failed request once with
+  /// the returned token. Return `null` when a token cannot be supplied.
+  /// An empty string or a thrown error is treated the same as `null`.
+  ///
+  /// Set the first token with [setUserJwt] before login. This callback only
+  /// supplies later tokens. Call [removeUserJwtProvider] to stop asking.
+  ///
+  /// On iOS and Android, the SDK stops waiting after 10 seconds. This plugin
+  /// does not add its own timeout.
+  ///
+  /// Note: this is not supported on web. Call [setUserJwt] again to refresh
+  /// the token there.
+  Future<void> setUserJwtProvider(UserJwtProvider provider) {
+    return IntercomFlutterPlatform.instance.setUserJwtProvider(provider);
+  }
+
+  /// Stops asking for fresh user JWTs.
+  ///
+  /// Requests rejected for an expired JWT fail until [setUserJwt] is called
+  /// with a new token.
+  ///
+  /// Note: this is not supported on web.
+  Future<void> removeUserJwtProvider() {
+    return IntercomFlutterPlatform.instance.removeUserJwtProvider();
   }
 
   /// Set up the authentication (user-defined token) to secure your Data
