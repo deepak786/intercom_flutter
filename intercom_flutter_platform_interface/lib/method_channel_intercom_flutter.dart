@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:intercom_flutter_platform_interface/enumeral.dart';
 import 'package:intercom_flutter_platform_interface/intercom_flutter_platform_interface.dart';
@@ -11,6 +12,7 @@ const EventChannel _windowDidHideChannel =
 /// An implementation of [IntercomFlutterPlatform] that uses method channels.
 class MethodChannelIntercomFlutter extends IntercomFlutterPlatform {
   static UserJwtProvider? _userJwtProvider;
+  static IntercomLocationPermissionProvider? _locationPermissionProvider;
   static bool _isMethodCallHandlerSet = false;
 
   /// Registers the single handler for calls from native code on [_channel].
@@ -27,6 +29,12 @@ class MethodChannelIntercomFlutter extends IntercomFlutterPlatform {
     switch (call.method) {
       case 'provideUserJwt':
         return _provideUserJwt();
+      case 'requestLocationWhenInUsePermission':
+        _locationPermissionProvider?.requestWhenInUsePermission();
+        return null;
+      case 'requestLocationAlwaysPermission':
+        _locationPermissionProvider?.requestAlwaysPermission();
+        return null;
       default:
         throw MissingPluginException();
     }
@@ -47,6 +55,10 @@ class MethodChannelIntercomFlutter extends IntercomFlutterPlatform {
       return null;
     }
   }
+
+  /// Only the iOS SDK has a location permission provider.
+  static bool get _supportsLocationPermissionProvider =>
+      defaultTargetPlatform == TargetPlatform.iOS;
 
   @override
   Future<void> initialize(
@@ -328,6 +340,39 @@ class MethodChannelIntercomFlutter extends IntercomFlutterPlatform {
     await _channel.invokeMethod('suppressProactiveContent', {
       'types': types.map((type) => type.name).toList(),
     });
+  }
+
+  @override
+  Future<void> setLocationPermissionProvider(
+      IntercomLocationPermissionProvider provider) async {
+    if (!_supportsLocationPermissionProvider) {
+      return;
+    }
+    _locationPermissionProvider = provider;
+    _ensureMethodCallHandler();
+    await _channel.invokeMethod('setLocationPermissionProvider', {
+      'status': provider.authorizationStatus.name,
+    });
+  }
+
+  @override
+  Future<void> updateLocationAuthorizationStatus(
+      IntercomLocationAuthorizationStatus status) async {
+    if (!_supportsLocationPermissionProvider) {
+      return;
+    }
+    await _channel.invokeMethod('updateLocationAuthorizationStatus', {
+      'status': status.name,
+    });
+  }
+
+  @override
+  Future<void> removeLocationPermissionProvider() async {
+    if (!_supportsLocationPermissionProvider) {
+      return;
+    }
+    _locationPermissionProvider = null;
+    await _channel.invokeMethod('removeLocationPermissionProvider');
   }
 
   /// Convert the [PlatformException] details to [IntercomError].

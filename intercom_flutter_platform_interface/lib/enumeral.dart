@@ -10,6 +10,18 @@ enum IntercomProactiveContentType {
   survey,
 }
 
+/// The location permission status reported by an
+/// `IntercomLocationPermissionProvider`.
+///
+/// Matches the iOS `CLAuthorizationStatus` values.
+enum IntercomLocationAuthorizationStatus {
+  notDetermined,
+  restricted,
+  denied,
+  authorizedAlways,
+  authorizedWhenInUse,
+}
+
 enum IntercomTheme {
   // // Enable dark mode
   dark,

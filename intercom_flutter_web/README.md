@@ -29,6 +29,9 @@ But you can pre-define some Intercom settings, if you want (optional), such as `
 - suppressProactiveContent
 - setUserJwtProvider
 - removeUserJwtProvider
+- setLocationPermissionProvider
+- updateLocationAuthorizationStatus
+- removeLocationPermissionProvider
 
 [1]: ../intercom_flutter
 

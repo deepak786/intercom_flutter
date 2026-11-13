@@ -111,6 +111,68 @@ class MyApp : Application() {
 ### iOS
 Make sure that you have a `NSPhotoLibraryUsageDescription` entry in your `Info.plist`.
 
+#### Location permission in Mobile Carousels
+Intercom does not request location permission itself, so your app does not need a location purpose string just because it includes Intercom.
+Mobile Carousel screens that ask for location permission are only shown once your app sets a provider with `setLocationPermissionProvider`.
+
+Add `NSLocationWhenInUseUsageDescription` to your `Info.plist`, and `NSLocationAlwaysAndWhenInUseUsageDescription` if you want Intercom to ask for "Always" access.
+Then implement the provider with your own permission handling. The example below uses [`permission_handler`](https://pub.dev/packages/permission_handler). Follow its iOS setup and enable `PERMISSION_LOCATION`, which it needs to request "Always" access:
+
+```dart
+Future<IntercomLocationAuthorizationStatus> locationStatus() async {
+  if (await Permission.locationAlways.isGranted) {
+    return IntercomLocationAuthorizationStatus.authorizedAlways;
+  }
+  switch (await Permission.locationWhenInUse.status) {
+    case PermissionStatus.granted:
+      return IntercomLocationAuthorizationStatus.authorizedWhenInUse;
+    case PermissionStatus.restricted:
+      return IntercomLocationAuthorizationStatus.restricted;
+    case PermissionStatus.permanentlyDenied:
+      return IntercomLocationAuthorizationStatus.denied;
+    default:
+      // On iOS, permission_handler reports `denied` when the user has not been
+      // asked yet. `permanentlyDenied` is the actual denial.
+      return IntercomLocationAuthorizationStatus.notDetermined;
+  }
+}
+
+Future<void> reportLocationStatus() async {
+  await Intercom.instance.updateLocationAuthorizationStatus(await locationStatus());
+}
+
+await Intercom.instance.setLocationPermissionProvider(
+  IntercomLocationPermissionProvider(
+    authorizationStatus: await locationStatus(),
+    // Report in `finally` so Intercom gets an answer even if a request throws.
+    requestWhenInUsePermission: () async {
+      try {
+        await Permission.locationWhenInUse.request();
+      } finally {
+        await reportLocationStatus();
+      }
+    },
+    requestAlwaysPermission: () async {
+      try {
+        // permission_handler only asks for "Always" once "When In Use" is granted.
+        if (!await Permission.locationWhenInUse.isGranted) {
+          await Permission.locationWhenInUse.request();
+        }
+        if (await Permission.locationWhenInUse.isGranted) {
+          await Permission.locationAlways.request();
+        }
+      } finally {
+        await reportLocationStatus();
+      }
+    },
+  ),
+);
+```
+
+Call `updateLocationAuthorizationStatus` after every request, even if the status did not change, and when the user changes the permission in Settings.
+
+`setLocationPermissionProvider`, `updateLocationAuthorizationStatus` and `removeLocationPermissionProvider` have no effect on Android. They are not supported on web and throw there, so guard the calls with `!kIsWeb` if your app also runs on web.
+
 ### Push notifications setup
 This plugin works in combination with the [`firebase_messaging`](https://pub.dev/packages/firebase_messaging) plugin to receive Push Notifications. To set this up:
 
@@ -152,6 +214,9 @@ But you can pre-define some Intercom settings, if you want (optional).
 - [ ] suppressProactiveContent
 - [ ] setUserJwtProvider
 - [ ] removeUserJwtProvider
+- [ ] setLocationPermissionProvider
+- [ ] updateLocationAuthorizationStatus
+- [ ] removeLocationPermissionProvider
 
 ## Using Intercom keys with `--dart-define`
 

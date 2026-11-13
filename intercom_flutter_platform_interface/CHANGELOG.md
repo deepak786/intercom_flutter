@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.10
+
+* Added methods `setLocationPermissionProvider`, `updateLocationAuthorizationStatus` and `removeLocationPermissionProvider`.
+
 ## 2.0.9
 
 * Added methods `setUserJwtProvider` and `removeUserJwtProvider`.

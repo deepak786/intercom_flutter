@@ -33,8 +33,72 @@ id windowDidHide;
 }
 @end
 
+static ICMLocationAuthorizationStatus LocationAuthorizationStatusFromName(id name) {
+    if ([@"restricted" isEqual:name]) {
+        return ICMLocationAuthorizationStatusRestricted;
+    } else if ([@"denied" isEqual:name]) {
+        return ICMLocationAuthorizationStatusDenied;
+    } else if ([@"authorizedAlways" isEqual:name]) {
+        return ICMLocationAuthorizationStatusAuthorizedAlways;
+    } else if ([@"authorizedWhenInUse" isEqual:name]) {
+        return ICMLocationAuthorizationStatusAuthorizedWhenInUse;
+    }
+    return ICMLocationAuthorizationStatusNotDetermined;
+}
+
+// Intercom reads the status synchronously, so the last status reported by Dart is cached here.
+@interface IntercomFlutterLocationPermissionProvider : NSObject <ICMLocationPermissionProvider>
+@property (atomic) ICMLocationAuthorizationStatus status;
+- (instancetype)initWithChannel:(FlutterMethodChannel *)channel status:(ICMLocationAuthorizationStatus)status;
+- (void)updateStatus:(ICMLocationAuthorizationStatus)status;
+@end
+
+@implementation IntercomFlutterLocationPermissionProvider {
+    __weak FlutterMethodChannel *_channel;
+}
+@synthesize authorizationStatusDidChange = _authorizationStatusDidChange;
+
+- (instancetype)initWithChannel:(FlutterMethodChannel *)channel status:(ICMLocationAuthorizationStatus)status {
+    self = [super init];
+    if (self) {
+        _channel = channel;
+        _status = status;
+    }
+    return self;
+}
+
+- (ICMLocationAuthorizationStatus)currentAuthorizationStatus {
+    return self.status;
+}
+
+- (void)requestWhenInUsePermission {
+    [self requestPermission:@"requestLocationWhenInUsePermission"];
+}
+
+- (void)requestAlwaysPermission {
+    [self requestPermission:@"requestLocationAlwaysPermission"];
+}
+
+// Dart reports the result through updateLocationAuthorizationStatus.
+- (void)requestPermission:(NSString *)method {
+    // Intercom may call from any thread, but Flutter channels must be used on the main thread.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self->_channel invokeMethod:method arguments:nil];
+    });
+}
+
+- (void)updateStatus:(ICMLocationAuthorizationStatus)status {
+    self.status = status;
+    void (^callback)(ICMLocationAuthorizationStatus) = self.authorizationStatusDidChange;
+    if (callback != nil) {
+        callback(status);
+    }
+}
+@end
+
 @implementation IntercomFlutterPlugin {
     FlutterMethodChannel *_channel;
+    IntercomFlutterLocationPermissionProvider *_locationPermissionProvider;
 }
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
@@ -346,6 +410,18 @@ id windowDidHide;
         }
         [Intercom suppressProactiveContent:contentTypes];
         result(@"Suppressed proactive content");
+    } else if([@"setLocationPermissionProvider" isEqualToString:call.method]) {
+        ICMLocationAuthorizationStatus status = LocationAuthorizationStatusFromName(call.arguments[@"status"]);
+        _locationPermissionProvider = [[IntercomFlutterLocationPermissionProvider alloc] initWithChannel:_channel status:status];
+        [Intercom setLocationPermissionProvider:_locationPermissionProvider];
+        result(@"Location permission provider set");
+    } else if([@"updateLocationAuthorizationStatus" isEqualToString:call.method]) {
+        [_locationPermissionProvider updateStatus:LocationAuthorizationStatusFromName(call.arguments[@"status"])];
+        result(@"Location authorization status updated");
+    } else if([@"removeLocationPermissionProvider" isEqualToString:call.method]) {
+        _locationPermissionProvider = nil;
+        [Intercom setLocationPermissionProvider:nil];
+        result(@"Location permission provider removed");
     } else if([@"setThemeMode" isEqualToString:call.method]) {
         NSString *theme = call.arguments[@"theme"];
         
