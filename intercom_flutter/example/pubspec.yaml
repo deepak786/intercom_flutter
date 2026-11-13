@@ -10,6 +10,7 @@ dependencies:
 
   intercom_flutter:
     path: ../
+  material_ui: ^1.11.0
 
 dependency_overrides:
   intercom_flutter:

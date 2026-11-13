@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:intercom_flutter/intercom_flutter.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

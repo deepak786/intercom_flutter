@@ -3,6 +3,7 @@
 ## 9.6.37
 
 * Bump Intercom iOS SDK version to [19.11.0](https://github.com/intercom/intercom-ios/releases/tag/19.11.0)
+* Migrated example app from deprecated `package:flutter/material.dart` to `package:material_ui`
 
 ## 9.6.36
 
