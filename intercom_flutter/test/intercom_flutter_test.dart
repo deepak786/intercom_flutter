@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intercom_flutter/intercom_flutter.dart';
@@ -382,6 +383,43 @@ void main() {
       expectMethodCall('suppressProactiveContent', arguments: {
         'types': [],
       });
+    });
+  });
+
+  group('locationPermissionProvider', () {
+    setUp(() {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    });
+
+    tearDown(() {
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    test('setLocationPermissionProvider', () async {
+      await Intercom.instance.setLocationPermissionProvider(
+        IntercomLocationPermissionProvider(
+          authorizationStatus:
+              IntercomLocationAuthorizationStatus.authorizedWhenInUse,
+          requestWhenInUsePermission: () {},
+          requestAlwaysPermission: () {},
+        ),
+      );
+      expectMethodCall('setLocationPermissionProvider', arguments: {
+        'status': 'authorizedWhenInUse',
+      });
+    });
+
+    test('updateLocationAuthorizationStatus', () async {
+      await Intercom.instance.updateLocationAuthorizationStatus(
+          IntercomLocationAuthorizationStatus.denied);
+      expectMethodCall('updateLocationAuthorizationStatus', arguments: {
+        'status': 'denied',
+      });
+    });
+
+    test('removeLocationPermissionProvider', () async {
+      await Intercom.instance.removeLocationPermissionProvider();
+      expectMethodCall('removeLocationPermissionProvider');
     });
   });
 }

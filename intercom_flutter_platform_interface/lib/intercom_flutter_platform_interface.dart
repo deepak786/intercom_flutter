@@ -8,6 +8,34 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 /// Return the new token, or `null` when one cannot be supplied.
 typedef UserJwtProvider = Future<String?> Function();
 
+/// Asks for location permission on Intercom's behalf. Mirrors the iOS
+/// `ICMLocationPermissionProvider` protocol.
+///
+/// Intercom does not request location permission itself. Implement these
+/// callbacks with your own permission handling, for example with the
+/// `permission_handler` or `geolocator` package, and report every status
+/// change with `updateLocationAuthorizationStatus`.
+class IntercomLocationPermissionProvider {
+  const IntercomLocationPermissionProvider({
+    required this.authorizationStatus,
+    required this.requestWhenInUsePermission,
+    required this.requestAlwaysPermission,
+  });
+
+  /// The app's location permission status when the provider is set.
+  final IntercomLocationAuthorizationStatus authorizationStatus;
+
+  /// Asks the user for "When In Use" location permission.
+  ///
+  /// Call `updateLocationAuthorizationStatus` when the request finishes.
+  final void Function() requestWhenInUsePermission;
+
+  /// Asks the user for "Always" location permission.
+  ///
+  /// Call `updateLocationAuthorizationStatus` when the request finishes.
+  final void Function() requestAlwaysPermission;
+}
+
 abstract class IntercomFlutterPlatform extends PlatformInterface {
   IntercomFlutterPlatform() : super(token: _token);
 
@@ -347,5 +375,47 @@ abstract class IntercomFlutterPlatform extends PlatformInterface {
       List<IntercomProactiveContentType> types) {
     throw UnimplementedError(
         'suppressProactiveContent() has not been implemented.');
+  }
+
+  /// Sets the [provider] Intercom uses to ask for location permission from
+  /// Mobile Carousel screens.
+  ///
+  /// Carousel screens that ask for location permission are only shown once a
+  /// provider is set. It replaces any provider set before.
+  ///
+  /// Your app must declare `NSLocationWhenInUseUsageDescription` in its
+  /// `Info.plist`, and `NSLocationAlwaysAndWhenInUseUsageDescription` if you
+  /// want Intercom to ask for "Always" access.
+  ///
+  /// Note: this is only supported on iOS. It has no effect on Android and is
+  /// not supported on web.
+  Future<void> setLocationPermissionProvider(
+      IntercomLocationPermissionProvider provider) {
+    throw UnimplementedError(
+        'setLocationPermissionProvider() has not been implemented.');
+  }
+
+  /// Tells Intercom the location permission [status] changed.
+  ///
+  /// Call it after each permission request finishes and when the user changes
+  /// the permission in Settings. It is ignored when no provider is set.
+  ///
+  /// Note: this is only supported on iOS. It has no effect on Android and is
+  /// not supported on web.
+  Future<void> updateLocationAuthorizationStatus(
+      IntercomLocationAuthorizationStatus status) {
+    throw UnimplementedError(
+        'updateLocationAuthorizationStatus() has not been implemented.');
+  }
+
+  /// Removes the provider set with [setLocationPermissionProvider].
+  ///
+  /// Carousel screens that ask for location permission are no longer shown.
+  ///
+  /// Note: this is only supported on iOS. It has no effect on Android and is
+  /// not supported on web.
+  Future<void> removeLocationPermissionProvider() {
+    throw UnimplementedError(
+        'removeLocationPermissionProvider() has not been implemented.');
   }
 }

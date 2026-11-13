@@ -8,9 +8,13 @@ import 'package:intercom_flutter_platform_interface/intercom_status_callback.dar
 
 /// export the [IntercomVisibility] enum
 export 'package:intercom_flutter_platform_interface/enumeral.dart'
-    show IntercomVisibility, IntercomTheme, IntercomProactiveContentType;
+    show
+        IntercomVisibility,
+        IntercomTheme,
+        IntercomProactiveContentType,
+        IntercomLocationAuthorizationStatus;
 export 'package:intercom_flutter_platform_interface/intercom_flutter_platform_interface.dart'
-    show UserJwtProvider;
+    show UserJwtProvider, IntercomLocationPermissionProvider;
 export 'package:intercom_flutter_platform_interface/intercom_status_callback.dart'
     show IntercomStatusCallback, IntercomError;
 
@@ -354,5 +358,46 @@ class Intercom {
   Future<void> suppressProactiveContent(
       List<IntercomProactiveContentType> types) {
     return IntercomFlutterPlatform.instance.suppressProactiveContent(types);
+  }
+
+  /// Sets the [provider] Intercom uses to ask for location permission from
+  /// Mobile Carousel screens.
+  ///
+  /// Carousel screens that ask for location permission are only shown once a
+  /// provider is set. It replaces any provider set before.
+  ///
+  /// Your app must declare `NSLocationWhenInUseUsageDescription` in its
+  /// `Info.plist`, and `NSLocationAlwaysAndWhenInUseUsageDescription` if you
+  /// want Intercom to ask for "Always" access.
+  ///
+  /// Note: this is only supported on iOS. It has no effect on Android and is
+  /// not supported on web.
+  Future<void> setLocationPermissionProvider(
+      IntercomLocationPermissionProvider provider) {
+    return IntercomFlutterPlatform.instance
+        .setLocationPermissionProvider(provider);
+  }
+
+  /// Tells Intercom the location permission [status] changed.
+  ///
+  /// Call it after each permission request finishes and when the user changes
+  /// the permission in Settings. It is ignored when no provider is set.
+  ///
+  /// Note: this is only supported on iOS. It has no effect on Android and is
+  /// not supported on web.
+  Future<void> updateLocationAuthorizationStatus(
+      IntercomLocationAuthorizationStatus status) {
+    return IntercomFlutterPlatform.instance
+        .updateLocationAuthorizationStatus(status);
+  }
+
+  /// Removes the provider set with [setLocationPermissionProvider].
+  ///
+  /// Carousel screens that ask for location permission are no longer shown.
+  ///
+  /// Note: this is only supported on iOS. It has no effect on Android and is
+  /// not supported on web.
+  Future<void> removeLocationPermissionProvider() {
+    return IntercomFlutterPlatform.instance.removeLocationPermissionProvider();
   }
 }

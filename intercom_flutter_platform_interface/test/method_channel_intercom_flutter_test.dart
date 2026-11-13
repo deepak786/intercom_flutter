@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intercom_flutter_platform_interface/enumeral.dart';
@@ -478,31 +479,31 @@ void main() {
 
     test('provideUserJwt returns the provider value', () async {
       await intercom.setUserJwtProvider(() async => 'fresh-jwt');
-      final result =
-          await _invokeProvideUserJwt(channel, logOutboundMethodCall);
+      final result = await _invokeFromNative(
+          channel, 'provideUserJwt', logOutboundMethodCall);
       expect(result, 'fresh-jwt');
     });
 
     test('provideUserJwt returns null when the provider returns null',
         () async {
       await intercom.setUserJwtProvider(() async => null);
-      final result =
-          await _invokeProvideUserJwt(channel, logOutboundMethodCall);
+      final result = await _invokeFromNative(
+          channel, 'provideUserJwt', logOutboundMethodCall);
       expect(result, isNull);
     });
 
     test('provideUserJwt returns null when the provider returns empty',
         () async {
       await intercom.setUserJwtProvider(() async => '');
-      final result =
-          await _invokeProvideUserJwt(channel, logOutboundMethodCall);
+      final result = await _invokeFromNative(
+          channel, 'provideUserJwt', logOutboundMethodCall);
       expect(result, isNull);
     });
 
     test('provideUserJwt returns null when the provider throws', () async {
       await intercom.setUserJwtProvider(() async => throw StateError('fail'));
-      final result =
-          await _invokeProvideUserJwt(channel, logOutboundMethodCall);
+      final result = await _invokeFromNative(
+          channel, 'provideUserJwt', logOutboundMethodCall);
       expect(result, isNull);
     });
 
@@ -532,8 +533,8 @@ void main() {
         log,
         <Matcher>[isMethodCall('removeUserJwtProvider', arguments: null)],
       );
-      final result =
-          await _invokeProvideUserJwt(channel, logOutboundMethodCall);
+      final result = await _invokeFromNative(
+          channel, 'provideUserJwt', logOutboundMethodCall);
       expect(result, isNull);
     });
 
@@ -627,14 +628,100 @@ void main() {
         );
       });
     });
+
+    group('locationPermissionProvider', () {
+      setUp(() {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      });
+
+      tearDown(() {
+        debugDefaultTargetPlatformOverride = null;
+      });
+
+      final calls = <String>[];
+
+      IntercomLocationPermissionProvider provider({
+        IntercomLocationAuthorizationStatus authorizationStatus =
+            IntercomLocationAuthorizationStatus.notDetermined,
+      }) {
+        return IntercomLocationPermissionProvider(
+          authorizationStatus: authorizationStatus,
+          requestWhenInUsePermission: () => calls.add('whenInUse'),
+          requestAlwaysPermission: () => calls.add('always'),
+        );
+      }
+
+      setUp(calls.clear);
+
+      test('setLocationPermissionProvider', () async {
+        await intercom.setLocationPermissionProvider(provider(
+          authorizationStatus: IntercomLocationAuthorizationStatus.denied,
+        ));
+        expect(
+          log,
+          <Matcher>[
+            isMethodCall('setLocationPermissionProvider', arguments: {
+              'status': 'denied',
+            })
+          ],
+        );
+      });
+
+      test('updateLocationAuthorizationStatus', () async {
+        await intercom.updateLocationAuthorizationStatus(
+            IntercomLocationAuthorizationStatus.authorizedWhenInUse);
+        expect(
+          log,
+          <Matcher>[
+            isMethodCall('updateLocationAuthorizationStatus', arguments: {
+              'status': 'authorizedWhenInUse',
+            })
+          ],
+        );
+      });
+
+      test('removeLocationPermissionProvider', () async {
+        await intercom.setLocationPermissionProvider(provider());
+        log.clear();
+        await intercom.removeLocationPermissionProvider();
+        expect(
+          log,
+          <Matcher>[
+            isMethodCall('removeLocationPermissionProvider', arguments: null)
+          ],
+        );
+        await _invokeFromNative(channel, 'requestLocationWhenInUsePermission',
+            logOutboundMethodCall);
+        expect(calls, isEmpty);
+      });
+
+      test('does nothing on Android', () async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        await intercom.setLocationPermissionProvider(provider());
+        await intercom.updateLocationAuthorizationStatus(
+            IntercomLocationAuthorizationStatus.denied);
+        await intercom.removeLocationPermissionProvider();
+        expect(log, isEmpty);
+      });
+
+      test('native requests call the provider', () async {
+        await intercom.setLocationPermissionProvider(provider());
+        await _invokeFromNative(channel, 'requestLocationWhenInUsePermission',
+            logOutboundMethodCall);
+        await _invokeFromNative(
+            channel, 'requestLocationAlwaysPermission', logOutboundMethodCall);
+        expect(calls, ['whenInUse', 'always']);
+      });
+    });
   });
 }
 
-/// Simulates native → Dart `provideUserJwt`. Clears the outbound mock so the
+/// Simulates native → Dart [method]. Clears the outbound mock so the
 /// inbound [MethodChannel.setMethodCallHandler] registered by
 /// [MethodChannelIntercomFlutter] receives the message.
-Future<Object?> _invokeProvideUserJwt(
+Future<Object?> _invokeFromNative(
   MethodChannel channel,
+  String method,
   Future<Object?> Function(MethodCall) restoreMockHandler,
 ) async {
   const codec = StandardMethodCodec();
@@ -644,7 +731,7 @@ Future<Object?> _invokeProvideUserJwt(
   try {
     final reply = await messenger.handlePlatformMessage(
       channel.name,
-      codec.encodeMethodCall(const MethodCall('provideUserJwt')),
+      codec.encodeMethodCall(MethodCall(method)),
       (_) {},
     );
     if (reply == null) {

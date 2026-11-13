@@ -4,6 +4,11 @@
 
 * Bump Intercom iOS SDK version to [19.11.0](https://github.com/intercom/intercom-ios/releases/tag/19.11.0)
 * Migrated example app from deprecated `package:flutter/material.dart` to `package:material_ui`
+* Added API `setLocationPermissionProvider` so Mobile Carousel screens can ask for location permission. iOS only.
+* Added API `updateLocationAuthorizationStatus`. iOS only.
+* Added API `removeLocationPermissionProvider`. iOS only.
+* Updated dependency `intercom_flutter_platform_interface: ^2.0.10`
+* Updated dependency `intercom_flutter_web: ^1.1.15`
 
 ## 9.6.36
 
