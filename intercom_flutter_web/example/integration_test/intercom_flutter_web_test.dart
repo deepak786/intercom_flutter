@@ -206,5 +206,15 @@ void main() {
         expect(plugin.setThemeMode(IntercomTheme.none), completes);
       });
     });
+
+    group('setMessengerStyleId', () {
+      testWidgets('sets the style', (WidgetTester _) async {
+        expect(plugin.setMessengerStyleId('123456'), completes);
+      });
+
+      testWidgets('clears the style', (WidgetTester _) async {
+        expect(plugin.setMessengerStyleId(null), completes);
+      });
+    });
   });
 }

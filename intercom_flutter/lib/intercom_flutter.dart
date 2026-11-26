@@ -400,4 +400,20 @@ class Intercom {
   Future<void> removeLocationPermissionProvider() {
     return IntercomFlutterPlatform.instance.removeLocationPermissionProvider();
   }
+
+  /// Sets which Messenger style to show, for example when one app serves
+  /// several brands.
+  ///
+  /// By default, the Messenger shows the style that matches your app (the
+  /// bundle ID on iOS, the page URL on web), or your default style if none
+  /// matches. Pass `null` or an empty string to go back to that behaviour.
+  ///
+  /// Style IDs are available in your Intercom workspace under
+  /// Settings → Messenger → Appearance → Manage Style.
+  ///
+  /// Note: this is only supported on iOS and web. It has no effect on Android,
+  /// where the Intercom SDK has no Messenger style API.
+  Future<void> setMessengerStyleId(String? styleId) {
+    return IntercomFlutterPlatform.instance.setMessengerStyleId(styleId);
+  }
 }

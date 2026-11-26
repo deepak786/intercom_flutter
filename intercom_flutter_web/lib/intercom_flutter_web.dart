@@ -367,6 +367,19 @@ class IntercomFlutterWeb extends IntercomFlutterPlatform {
     print("Theme overridden");
   }
 
+  @override
+  Future<void> setMessengerStyleId(String? styleId) async {
+    globalContext.callMethod(
+      'Intercom'.toJS,
+      'update'.toJS,
+      updateIntercomSettings(
+        'messenger_style_id',
+        styleId?.isEmpty ?? true ? null : styleId,
+      ).jsify(),
+    );
+    print("Messenger style set");
+  }
+
   /// get the [window.intercomSettings]
   Map<dynamic, dynamic> getIntercomSettings() {
     if (globalContext.hasProperty('intercomSettings'.toJS).toDart) {

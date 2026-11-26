@@ -375,6 +375,13 @@ class MethodChannelIntercomFlutter extends IntercomFlutterPlatform {
     await _channel.invokeMethod('removeLocationPermissionProvider');
   }
 
+  @override
+  Future<void> setMessengerStyleId(String? styleId) async {
+    await _channel.invokeMethod('setMessengerStyleId', {
+      'styleId': styleId,
+    });
+  }
+
   /// Convert the [PlatformException] details to [IntercomError].
   /// From the Platform side if the intercom operation failed then error details
   /// will be sent as details in [PlatformException].

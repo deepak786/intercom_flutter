@@ -381,6 +381,9 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
         }
         result.success("Theme overridden")
       }
+      "setMessengerStyleId" -> {
+        result.success("Messenger style is not available on Android")
+      }
       else -> result.notImplemented()
     }
   }

@@ -435,6 +435,13 @@ static ICMLocationAuthorizationStatus LocationAuthorizationStatusFromName(id nam
             [Intercom setThemeOverride:ICMThemeOverrideNone];
         }
         result(@"Theme overridden");
+    } else if([@"setMessengerStyleId" isEqualToString:call.method]) {
+        NSString *styleId = call.arguments[@"styleId"];
+        if(styleId == (id)[NSNull null]) {
+            styleId = nil;
+        }
+        [Intercom setMessengerStyleId:styleId];
+        result(@"Messenger style set");
     }
     else {
         result(FlutterMethodNotImplemented);

@@ -713,6 +713,32 @@ void main() {
         expect(calls, ['whenInUse', 'always']);
       });
     });
+
+    group('setMessengerStyleId', () {
+      test('sets the style', () async {
+        await intercom.setMessengerStyleId('123456');
+        expect(
+          log,
+          <Matcher>[
+            isMethodCall('setMessengerStyleId', arguments: {
+              'styleId': '123456',
+            })
+          ],
+        );
+      });
+
+      test('clears the style', () async {
+        await intercom.setMessengerStyleId(null);
+        expect(
+          log,
+          <Matcher>[
+            isMethodCall('setMessengerStyleId', arguments: {
+              'styleId': null,
+            })
+          ],
+        );
+      });
+    });
   });
 }
 
