@@ -1,7 +1,10 @@
 # intercom_flutter
 
 [![Pub](https://img.shields.io/pub/v/intercom_flutter.svg)](https://pub.dev/packages/intercom_flutter)
-![CI](https://github.com/v3rm0n/intercom_flutter/workflows/CI/badge.svg)
+![CI](https://github.com/deepak786/intercom_flutter/workflows/CI/badge.svg)
+[![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-ea4aaa?logo=githubsponsors)](https://github.com/sponsors/deepak786)
+
+> This is a community-maintained package and is not affiliated with or backed by Intercom. It wraps the official Intercom SDKs, so you need your own [Intercom](https://www.intercom.com) account and plan. If it helps your product, please consider [supporting its development](#support).
 
 Flutter wrapper for Intercom [Android](https://github.com/intercom/intercom-android), [iOS](https://github.com/intercom/intercom-ios), and [Web](https://developers.intercom.com/installing-intercom/docs/basic-javascript) projects.
 
@@ -283,5 +286,8 @@ class MyApp : Application() {
 
 If you find this package helpful, you can support the development by:
 
+- [GitHub Sponsors](https://github.com/sponsors/deepak786)
 - [Buy Me A Coffee](https://buymeacoffee.com/deepakdroid)
 - [PayPal](https://paypal.me/deepakdroid)
+
+Using this package in a commercial product? [Sponsor its development](https://github.com/sponsors/deepak786) or [reach out](https://github.com/deepak786) for paid integration support.
