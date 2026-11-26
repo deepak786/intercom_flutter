@@ -1,7 +1,11 @@
 name: intercom_flutter_platform_interface
 description: A common platform interface for the intercom_flutter plugin.
 version: 2.0.11
-homepage: https://github.com/v3rm0n/intercom_flutter
+homepage: https://github.com/deepak786/intercom_flutter
+funding:
+  - https://github.com/sponsors/deepak786
+  - https://buymeacoffee.com/deepakdroid
+  - https://paypal.me/deepakdroid
 
 dependencies:
   flutter:

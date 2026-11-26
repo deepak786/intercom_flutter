@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 A new flutter plugin project.
                        DESC
-  s.homepage         = 'https://github.com/ChangeFinance/intercom_flutter'
+  s.homepage         = 'https://github.com/deepak786/intercom_flutter'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'xChange OÜ' => 'maido@getchange.com' }
   s.source           = { :path => '.' }
