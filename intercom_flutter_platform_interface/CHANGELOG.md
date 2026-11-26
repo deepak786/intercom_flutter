@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.11
+
+* Added method `setMessengerStyleId`.
+
 ## 2.0.10
 
 * Added methods `setLocationPermissionProvider`, `updateLocationAuthorizationStatus` and `removeLocationPermissionProvider`.

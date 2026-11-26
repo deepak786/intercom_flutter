@@ -422,4 +422,20 @@ void main() {
       expectMethodCall('removeLocationPermissionProvider');
     });
   });
+
+  group('setMessengerStyleId', () {
+    test('sets the style', () async {
+      await Intercom.instance.setMessengerStyleId('123456');
+      expectMethodCall('setMessengerStyleId', arguments: {
+        'styleId': '123456',
+      });
+    });
+
+    test('clears the style', () async {
+      await Intercom.instance.setMessengerStyleId(null);
+      expectMethodCall('setMessengerStyleId', arguments: {
+        'styleId': null,
+      });
+    });
+  });
 }

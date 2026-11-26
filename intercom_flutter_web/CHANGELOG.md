@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.16
+
+* Implemented `setMessengerStyleId`.
+* Updated `intercom_flutter_platform_interface` to `^2.0.11`.
+
 ## 1.1.15
 
 * Updated `intercom_flutter_platform_interface` to `^2.0.10`.

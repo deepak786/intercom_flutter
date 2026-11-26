@@ -1,5 +1,15 @@
 # Changelog
 
+## 9.7.0
+
+* Bump Intercom Android SDK version to [19.0.0](https://github.com/intercom/intercom-android/releases/tag/19.0.0)
+  * The Android SDK removed `Intercom.setMessengerEnvironment`. If your app calls it from native code, replace it with the `AndroidManifest.xml` `<meta-data>` entry described in the release notes.
+* Bump Intercom iOS SDK version to [19.13.0](https://github.com/intercom/intercom-ios/releases/tag/19.13.0)
+* Bump Android `com.google.firebase:firebase-messaging` version to 25.1.3
+* Added API `setMessengerStyleId` to choose which Messenger style to show. Supported on iOS and web; it has no effect on Android.
+* Updated dependency `intercom_flutter_platform_interface: ^2.0.11`
+* Updated dependency `intercom_flutter_web: ^1.1.16`
+
 ## 9.6.39
 
 * Bump Intercom Android SDK version to [18.14.0](https://github.com/intercom/intercom-android/releases/tag/18.14.0)
